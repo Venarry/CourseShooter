@@ -2,11 +2,11 @@ using UnityEngine;
 
 public class PlayerFactory
 {
-    private readonly PlayerMovement _prefab = Resources.Load<PlayerMovement>(ResourcesPath.PlayerPrefab);
+    private readonly PlayerView _prefab = Resources.Load<PlayerView>(ResourcesPath.PlayerPrefab);
 
-    public PlayerMovement Create(Vector3 position)
+    public PlayerView Create(Vector3 position)
     {
-        PlayerMovement player = Object.Instantiate(_prefab, position, Quaternion.identity);
+        PlayerView player = Object.Instantiate(_prefab, position, Quaternion.identity);
 
         IInputsHandler inputsHandler = new KeyboardInputsHandler();
         player.Init(inputsHandler);

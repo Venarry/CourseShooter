@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public class MultiplayerHolder : ColyseusManager<MultiplayerHolder>
 {
     private ColyseusRoom<State> _room;
-    private readonly Dictionary<string, EnemyMovement> _enemys = new();
+    private readonly Dictionary<string, EnemyView> _enemys = new();
     private PlayerFactory _playerFactory;
     private EnemyFactory _enemyFactory;
 
@@ -59,7 +59,7 @@ public class MultiplayerHolder : ColyseusManager<MultiplayerHolder>
 
     private void SpawnEnemy(string key, Player player)
     {
-        EnemyMovement enemy = _enemyFactory.Create(new Vector3(player.x, 0, player.z));
+        EnemyView enemy = _enemyFactory.Create(new Vector3(player.x, 0, player.z));
         _enemys.Add(key, enemy);
         player.OnChange += enemy.OnChange;
     }

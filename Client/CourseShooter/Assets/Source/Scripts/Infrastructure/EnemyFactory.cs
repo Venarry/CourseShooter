@@ -2,11 +2,11 @@ using UnityEngine;
 
 public class EnemyFactory
 {
-    private readonly EnemyMovement _prefab = Resources.Load<EnemyMovement>(ResourcesPath.EnemyPrefab);
+    private readonly EnemyView _prefab = Resources.Load<EnemyView>(ResourcesPath.EnemyPrefab);
 
-    public EnemyMovement Create(Vector3 position)
+    public EnemyView Create(Vector3 position)
     {
-        EnemyMovement enemy = Object.Instantiate(_prefab, position, Quaternion.identity);
+        EnemyView enemy = Object.Instantiate(_prefab, position, Quaternion.identity);
 
         return enemy;
     }
