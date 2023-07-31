@@ -26,67 +26,50 @@ public class EnemyView : MonoBehaviour
         _enemyMovement.MoveDirectionChanged += OnSpeedChanged;
     }
 
-    public void OnChange(List<DataChange> dataChanges)
+    public void OnPositionChange(List<DataChange> changes)
     {
         Vector3 targetPosition = transform.position;
+        targetPosition = ApplyDataChanges(changes, targetPosition);
 
-        foreach (DataChange change in dataChanges)
-        {
-            switch (change.Field)
-            {
-                case "x":
-                    targetPosition.x = (float)change.Value;
-                    break;
+        _enemyMovement.SetMovePosition(targetPosition);
+    }
 
-                case "y":
-                    targetPosition.y = (float)change.Value;
-                    break;
-
-                case "z":
-                    targetPosition.z = (float)change.Value;
-                    break;
-
-                case "DirectionX":
-                    _moveDirection.x = (float)change.Value;
-                    break;
-
-                case "DirectionY":
-                    _moveDirection.y = (float)change.Value;
-                    break;
-
-                case "DirectionZ":
-                    _moveDirection.z = (float)change.Value;
-                    break;
-            }
-        }
-
-        _enemyMovement.SetMoveData(targetPosition, _moveDirection);
+    public void OnDirectionChange(List<DataChange> changes)
+    {
+        _moveDirection = ApplyDataChanges(changes, _moveDirection);
+        _enemyMovement.SetMoveDirection(_moveDirection);
     }
 
     public void OnRotationChange(List<DataChange> changes)
     {
         Vector3 targetRotation = transform.rotation.eulerAngles;
         targetRotation.x = _enemyRotation.HeadRotationX;
+        targetRotation = ApplyDataChanges(changes, targetRotation);
 
+        _enemyRotation.SetRotation(targetRotation);
+    }
+
+    private Vector3 ApplyDataChanges(List<DataChange> changes, Vector3 startValue)
+    {
         foreach (DataChange change in changes)
         {
             switch (change.Field)
             {
                 case "x":
-                    targetRotation.x = (float)change.Value;
+                    startValue.x = (float)change.Value;
                     break;
 
                 case "y":
-                    targetRotation.y = (float)change.Value;
+                    startValue.y = (float)change.Value;
                     break;
 
                 case "z":
-                    targetRotation.z = (float)change.Value;
+                    startValue.z = (float)change.Value;
                     break;
             }
         }
 
-        _enemyRotation.SetRotation(targetRotation);
+        return startValue;
     }
 
     private void OnGroundedChanged(bool state)

@@ -51,7 +51,7 @@ public class PlayerView : MonoBehaviour
         }*/
 
         MovementData movementData = new(position, _playerMovement.Velocity);
-        MultiplayerHolder.Instance.SendPlayerPosition("move", movementData);
+        MultiplayerHolder.Instance.SendPlayerPosition("Move", movementData);
         _pingTimer = 0;
     }
     private void OnRotationXChanged(Vector3 rotation)

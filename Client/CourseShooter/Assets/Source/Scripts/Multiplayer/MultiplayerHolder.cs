@@ -59,14 +59,16 @@ public class MultiplayerHolder : ColyseusManager<MultiplayerHolder>
 
     private void SpawnPlayer(Player player)
     {
-        _playerFactory.Create(new Vector3(player.x, 0, player.z));
+        _playerFactory.Create(new Vector3(player.Position.x, 0, player.Position.z));
     }
 
     private void SpawnEnemy(string key, Player player)
     {
-        EnemyView enemy = _enemyFactory.Create(new Vector3(player.x, 0, player.z));
+        EnemyView enemy = _enemyFactory.Create(new Vector3(player.Position.x, 0, player.Position.z));
         _enemys.Add(key, enemy);
-        player.OnChange += enemy.OnChange;
+
+        player.Position.OnChange += enemy.OnPositionChange;
+        player.Direction.OnChange += enemy.OnDirectionChange;
         player.Rotation.OnChange += enemy.OnRotationChange;
     }
 }

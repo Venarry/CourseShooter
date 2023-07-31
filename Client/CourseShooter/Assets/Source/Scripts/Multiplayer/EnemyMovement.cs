@@ -32,9 +32,13 @@ public class EnemyMovement : MonoBehaviour
         MoveDirectionChanged?.Invoke(_characterController.velocity);
     }
 
-    public void SetMoveData(Vector3 newPosition, Vector3 moveDirection)
+    public void SetMovePosition(Vector3 newPosition)
     {
         _newPosition = newPosition;
+    }
+
+    public void SetMoveDirection(Vector3 moveDirection)
+    {
         _moveDirection = moveDirection;
     }
 

@@ -11,54 +11,50 @@ export class MyVector3 extends Schema
 
     @type("number")
     z = 0;
+
+    constructor (x = 0, y = 0, z = 0)
+    {
+        super();
+
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+
+    SetValues(newValues: any)
+    {
+        this.x = newValues.x;
+        this.y = newValues.y;
+        this.z = newValues.z;
+    }
 }
 
-export class Player extends Schema {
-    @type("number")
-    x = Math.floor(Math.random() * 7 - 3.5);
+export class Player extends Schema 
+{
+    @type(MyVector3)
+    Position = new MyVector3(Math.floor(Math.random() * 7 - 3.5), 0, Math.floor(Math.random() * 7 - 3.5));
 
-    @type("number")
-    y = 0;
-
-    @type("number")
-    z = Math.floor(Math.random() * 7 - 3.5);
-
-    @type("number")
-    DirectionX = 0;
-
-    @type("number")
-    DirectionY = 0;
-
-    @type("number")
-    DirectionZ = 0;
+    @type(MyVector3)
+    Direction = new MyVector3();
 
     @type(MyVector3)
     Rotation = new MyVector3();
 
-    SetPosition(moveData: any)
+    SetMoveData(newMovemetData: any)
     {
-        this.x = moveData.Position.x;
-        this.y = moveData.Position.y;
-        this.z = moveData.Position.z;
-
-        this.DirectionX = moveData.Direction.x;
-        this.DirectionY = moveData.Direction.y;
-        this.DirectionZ = moveData.Direction.z;
+        this.Position.SetValues(newMovemetData.Position);
+        this.Direction.SetValues(newMovemetData.Direction);
     }
 
-    SetRotation(targetRotation: MyVector3)
+    SetRotation(targetRotation: any)
     {
-        this.Rotation.x = targetRotation.x;
-        this.Rotation.y = targetRotation.y;
-        this.Rotation.z = targetRotation.z;
+        this.Rotation.SetValues(targetRotation);
     }
 }
 
 export class State extends Schema {
     @type({ map: Player })
     players = new MapSchema<Player>();
-
-    something = "This attribute won't be sent to the client-side";
 
     createPlayer(sessionId: string) {
         this.players.set(sessionId, new Player());
@@ -70,7 +66,7 @@ export class State extends Schema {
 
     movePlayer (sessionId: string, movement: any) 
     {
-        this.players.get(sessionId).SetPosition(movement);
+        this.players.get(sessionId).SetMoveData(movement);
     }
 
     RotatePlayer(sessionId: string, targetRotation: any)
@@ -87,7 +83,7 @@ export class StateHandlerRoom extends Room<State> {
 
         this.setState(new State());
 
-        this.onMessage("move", (client, data) => 
+        this.onMessage("Move", (client, data) => 
         {
             this.state.movePlayer(client.sessionId, data);
         });
