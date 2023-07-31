@@ -7,7 +7,7 @@
 
 using Colyseus.Schema;
 
-public partial class Player : Schema {
+public partial class MyVector3 : Schema {
 	[Type(0, "number")]
 	public float x = default(float);
 
@@ -16,17 +16,5 @@ public partial class Player : Schema {
 
 	[Type(2, "number")]
 	public float z = default(float);
-
-	[Type(3, "number")]
-	public float DirectionX = default(float);
-
-	[Type(4, "number")]
-	public float DirectionY = default(float);
-
-	[Type(5, "number")]
-	public float DirectionZ = default(float);
-
-	[Type(6, "ref", typeof(MyVector3))]
-	public MyVector3 Rotation = new MyVector3();
 }
 

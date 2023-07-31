@@ -54,8 +54,9 @@ public class PlayerView : MonoBehaviour
         MultiplayerHolder.Instance.SendPlayerPosition("move", movementData);
         _pingTimer = 0;
     }
-    private void OnRotationXChanged(float angle)
+    private void OnRotationXChanged(Vector3 rotation)
     {
         //_head.transform.localRotation = Quaternion.Euler(angle, 0, 0);
+        MultiplayerHolder.Instance.SendPlayerData("Rotate", rotation);
     }
 }

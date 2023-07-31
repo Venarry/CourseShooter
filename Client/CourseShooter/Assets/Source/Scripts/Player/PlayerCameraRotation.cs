@@ -7,9 +7,9 @@ public class PlayerCameraRotation : MonoBehaviour
 
     private IInputsHandler _inputsHandler;
     private Vector3 _currentRotation;
-    private float _sensetivity = 5;
+    private float _sensetivity = 10;
 
-    public event Action<float> RotationXChanged;
+    public event Action<Vector3> RotationXChanged;
 
     public void Init(IInputsHandler inputsHandler)
     {
@@ -23,7 +23,7 @@ public class PlayerCameraRotation : MonoBehaviour
         _camera.transform.localRotation = Quaternion.Euler(_currentRotation.x, 0, 0);
         transform.rotation = Quaternion.Euler(0, _currentRotation.y, 0);
 
-        RotationXChanged?.Invoke(_currentRotation.x);
+        RotationXChanged?.Invoke(_currentRotation);
     }
 
     public void AddRotationAxis()

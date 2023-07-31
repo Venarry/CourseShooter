@@ -9,51 +9,14 @@ public class EnemyMovement : MonoBehaviour
     private CharacterController _characterController;
 
     private Vector3 _moveDirection = Vector3.zero;
-    private Vector3 _newPosition;
+    private Vector3 _newPosition = Vector3.zero;
 
-    public event Action<bool> GroundedChanged;
+    public event Action<bool> GroundedStateChanged;
     public event Action<Vector3> MoveDirectionChanged;
 
     private void Awake()
     {
         _characterController = GetComponent<CharacterController>();
-    }
-
-    public void OnChange(List<DataChange> dataChanges)
-    {
-        Vector3 targetPosition = transform.position;
-
-        foreach (DataChange change in dataChanges)
-        {
-            switch (change.Field)
-            {
-                case "x":
-                    targetPosition.x = (float)change.Value;
-                    break;
-
-                case "y":
-                    targetPosition.y = (float)change.Value;
-                    break;
-
-                case "z":
-                    targetPosition.z = (float)change.Value;
-                    break;
-
-                case "DirectionX":
-                    _moveDirection.x = (float)change.Value;
-                    break;
-
-                case "DirectionY":
-                    _moveDirection.y = (float)change.Value;
-                    break;
-
-                case "DirectionZ":
-                    _moveDirection.z = (float)change.Value;
-                    break;
-            }
-        }
-
-        _newPosition = targetPosition;
     }
 
     private void FixedUpdate()
@@ -63,10 +26,16 @@ public class EnemyMovement : MonoBehaviour
 
         if(startGroundState != _characterController.isGrounded)
         {
+            GroundedStateChanged?.Invoke(_characterController.isGrounded);
         }
-            GroundedChanged?.Invoke(_characterController.isGrounded);
 
         MoveDirectionChanged?.Invoke(_characterController.velocity);
+    }
+
+    public void SetMoveData(Vector3 newPosition, Vector3 moveDirection)
+    {
+        _newPosition = newPosition;
+        _moveDirection = moveDirection;
     }
 
     private void InterpolateWithLerp()

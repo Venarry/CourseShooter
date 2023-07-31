@@ -7,7 +7,7 @@ public class EnemyAnimation : MonoBehaviour
     private readonly int _grounded = Animator.StringToHash("Grounded"); 
     private readonly int _speed = Animator.StringToHash("Speed"); 
 
-    public void SetGround(bool state)
+    public void SetGroundState(bool state)
     {
         _footsAnimation.SetBool(_grounded, state);
     }

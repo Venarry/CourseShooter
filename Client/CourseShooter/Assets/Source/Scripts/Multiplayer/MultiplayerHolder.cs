@@ -19,12 +19,17 @@ public class MultiplayerHolder : ColyseusManager<MultiplayerHolder>
         _room.Send(key, movementData);
     }
 
+    public void SendPlayerData(string key, object data)
+    {
+        _room.Send(key, data);
+    }
+
     public async void JoinRoom()
     {
         _playerFactory = new();
         _enemyFactory = new();
 
-        _room = await Instance.client.JoinOrCreate<State>("state_handler");
+        _room = await client.JoinOrCreate<State>("state_handler");
         _room.State.players.OnAdd += SpawnHero;
         _room.State.players.OnRemove += RemoveHero;
     }
@@ -62,5 +67,6 @@ public class MultiplayerHolder : ColyseusManager<MultiplayerHolder>
         EnemyView enemy = _enemyFactory.Create(new Vector3(player.x, 0, player.z));
         _enemys.Add(key, enemy);
         player.OnChange += enemy.OnChange;
+        player.Rotation.OnChange += enemy.OnRotationChange;
     }
 }

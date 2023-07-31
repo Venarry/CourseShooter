@@ -12,7 +12,9 @@ public class PlayerMovement : MonoBehaviour
     private IInputsHandler _inputsHandler;
 
     private Vector3 _moveDirection;
+    private Vector3 _localVelocity;
     private float _gravityForce;
+    private bool _isStayOnGound;
 
     public event Action<Vector3> DataChanged;
 
@@ -40,8 +42,8 @@ public class PlayerMovement : MonoBehaviour
 
         if(previousVelocity != currentVelocity)
         {
-        }
             DataChanged?.Invoke(transform.position);
+        }
     }
 
     private void Update()
@@ -54,8 +56,18 @@ public class PlayerMovement : MonoBehaviour
         _moveDirection = _inputsHandler.MoveDirection;
         _moveDirection = _moveDirection.normalized;
         _moveDirection *= _speed;
-        _moveDirection = transform.forward * _moveDirection.z + transform.right * _moveDirection.x;
+        _moveDirection += _localVelocity;
         _moveDirection.y = _gravityForce;
+
+        _moveDirection = transform.forward * _moveDirection.z + transform.right * _moveDirection.x + transform.up * _moveDirection.y; 
+
+        if (_localVelocity.magnitude >= 0f)
+        {
+            _localVelocity -= _localVelocity * 0.02f;
+
+            if (_localVelocity.magnitude < 0f)
+                _localVelocity = Vector3.zero;
+        }
     }
 
     public void TryJump()
@@ -63,16 +75,33 @@ public class PlayerMovement : MonoBehaviour
         if (_characterController.isGrounded && _inputsHandler.IsPressedKeyJump)
         {
             _gravityForce = _jumpStrength;
+            _isStayOnGound = false;
         }
     }
 
     private void ReduceGravityForce()
     {
-        float groudedGravity = -1f;
+        float groudedGravity = -0.01f;
 
         if (_characterController.isGrounded)
+        {
             _gravityForce = groudedGravity;
+            _localVelocity = Vector3.zero;
+            _isStayOnGound = true;
+        }
         else
+        {
+            if (_isStayOnGound)
+            {
+                Vector3 moveDirection = _inputsHandler.MoveDirection;
+                float stepSpeedMultiplier = 0.4f;
+
+                _localVelocity += new Vector3(moveDirection.x * _speed * stepSpeedMultiplier, 0, moveDirection.z * _speed * stepSpeedMultiplier);
+                _gravityForce = 0;
+                _isStayOnGound = false;
+            }
+
             _gravityForce -= _gravity;
+        }
     }
 }

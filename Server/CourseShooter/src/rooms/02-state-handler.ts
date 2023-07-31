@@ -1,6 +1,18 @@
 import { Room, Client } from "colyseus";
 import { Schema, type, MapSchema } from "@colyseus/schema";
 
+export class MyVector3 extends Schema
+{
+    @type("number")
+    x = 0;
+
+    @type("number")
+    y = 0;
+
+    @type("number")
+    z = 0;
+}
+
 export class Player extends Schema {
     @type("number")
     x = Math.floor(Math.random() * 7 - 3.5);
@@ -20,6 +32,9 @@ export class Player extends Schema {
     @type("number")
     DirectionZ = 0;
 
+    @type(MyVector3)
+    Rotation = new MyVector3();
+
     SetPosition(moveData: any)
     {
         this.x = moveData.Position.x;
@@ -29,6 +44,13 @@ export class Player extends Schema {
         this.DirectionX = moveData.Direction.x;
         this.DirectionY = moveData.Direction.y;
         this.DirectionZ = moveData.Direction.z;
+    }
+
+    SetRotation(targetRotation: MyVector3)
+    {
+        this.Rotation.x = targetRotation.x;
+        this.Rotation.y = targetRotation.y;
+        this.Rotation.z = targetRotation.z;
     }
 }
 
@@ -50,6 +72,11 @@ export class State extends Schema {
     {
         this.players.get(sessionId).SetPosition(movement);
     }
+
+    RotatePlayer(sessionId: string, targetRotation: any)
+    {
+        this.players.get(sessionId).SetRotation(targetRotation);
+    }
 }
 
 export class StateHandlerRoom extends Room<State> {
@@ -63,6 +90,11 @@ export class StateHandlerRoom extends Room<State> {
         this.onMessage("move", (client, data) => 
         {
             this.state.movePlayer(client.sessionId, data);
+        });
+
+        this.onMessage("Rotate", (client, data) => 
+        {
+            this.state.RotatePlayer(client.sessionId, data);
         });
     }
 
