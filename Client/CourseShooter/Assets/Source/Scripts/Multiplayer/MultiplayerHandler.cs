@@ -2,7 +2,7 @@ using Colyseus;
 using UnityEngine;
 using System.Collections.Generic;
 
-public class MultiplayerHolder : ColyseusManager<MultiplayerHolder>
+public class MultiplayerHandler : ColyseusManager<MultiplayerHandler>
 {
     private ColyseusRoom<State> _room;
     private readonly Dictionary<string, EnemyView> _enemys = new();

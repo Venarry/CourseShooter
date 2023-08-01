@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Bootstrapper : MonoBehaviour
 {
-    [SerializeField] private MultiplayerHolder _multiplayerHolder;
+    [SerializeField] private MultiplayerHandler _multiplayerHolder;
 
     private void Awake()
     {

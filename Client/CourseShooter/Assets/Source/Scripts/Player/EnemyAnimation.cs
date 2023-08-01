@@ -15,7 +15,6 @@ public class EnemyAnimation : MonoBehaviour
     public void SetMovementSpeed(float speed)
     {
         speed = Mathf.Clamp(speed, -1, 1);
-
         _footsAnimation.SetFloat(_speed, speed);
     }
 }

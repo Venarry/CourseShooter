@@ -23,7 +23,7 @@ public class EnemyView : MonoBehaviour
     private void OnEnable()
     {
         _enemyMovement.GroundedStateChanged += OnGroundedChanged;
-        _enemyMovement.MoveDirectionChanged += OnSpeedChanged;
+        _enemyMovement.MoveDirectionChanged += OnVelocityChanged;
     }
 
     public void OnPositionChange(List<DataChange> changes)
@@ -77,8 +77,9 @@ public class EnemyView : MonoBehaviour
         _enemyAnimation.SetGroundState(state);
     }
 
-    private void OnSpeedChanged(Vector3 direction)
+    private void OnVelocityChanged(Vector3 velocity)
     {
-        _enemyAnimation.SetMovementSpeed(direction.z);
+        float sign = Mathf.Sign(velocity.z);
+        _enemyAnimation.SetMovementSpeed(velocity.magnitude * sign);
     }
 }

@@ -44,6 +44,9 @@ public class PlayerMovement : MonoBehaviour
         {
             DataChanged?.Invoke(transform.position);
         }
+
+        Debug.Log(Mathf.Sign(_moveDirection.normalized.z));
+        Debug.Log(_moveDirection.magnitude);
     }
 
     private void Update()
@@ -60,14 +63,6 @@ public class PlayerMovement : MonoBehaviour
         _moveDirection.y = _gravityForce;
 
         _moveDirection = transform.forward * _moveDirection.z + transform.right * _moveDirection.x + transform.up * _moveDirection.y; 
-
-        if (_localVelocity.magnitude >= 0f)
-        {
-            _localVelocity -= _localVelocity * 0.02f;
-
-            if (_localVelocity.magnitude < 0f)
-                _localVelocity = Vector3.zero;
-        }
     }
 
     public void TryJump()
@@ -102,6 +97,15 @@ public class PlayerMovement : MonoBehaviour
             }
 
             _gravityForce -= _gravity;
+        }
+
+
+        if (_localVelocity.magnitude >= 0f)
+        {
+            _localVelocity -= _localVelocity * 0.02f;
+
+            if (_localVelocity.magnitude < 0f)
+                _localVelocity = Vector3.zero;
         }
     }
 }

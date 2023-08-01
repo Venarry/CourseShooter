@@ -51,12 +51,12 @@ public class PlayerView : MonoBehaviour
         }*/
 
         MovementData movementData = new(position, _playerMovement.Velocity);
-        MultiplayerHolder.Instance.SendPlayerPosition("Move", movementData);
+        MultiplayerHandler.Instance.SendPlayerPosition("Move", movementData);
         _pingTimer = 0;
     }
     private void OnRotationXChanged(Vector3 rotation)
     {
         //_head.transform.localRotation = Quaternion.Euler(angle, 0, 0);
-        MultiplayerHolder.Instance.SendPlayerData("Rotate", rotation);
+        MultiplayerHandler.Instance.SendPlayerData("Rotate", rotation);
     }
 }
