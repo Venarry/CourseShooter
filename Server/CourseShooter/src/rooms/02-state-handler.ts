@@ -130,6 +130,11 @@ export class StateHandlerRoom extends Room<State> {
             //this.broadcast("WeaponSwitched", data, {except: client});
             this.state.SwitchWeapon(client.sessionId, data);
         });
+
+        this.onMessage("OnShoot", (client, data) => 
+        {
+            this.broadcast("Shoot", data, {except: client});
+        });
     }
 
     onAuth(client, options, req) {

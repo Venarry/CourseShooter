@@ -10,6 +10,7 @@ public class PlayerView : MonoBehaviour
     private PlayerMovement _playerMovement;
     private PlayerRotation _playerCameraRotation;
     private PlayerWeaponView _playerWeaponView;
+    private MultiplayerHandler _multiplayerHandler;
     private IInputsHandler _inputsHandler;
     private bool _isInitialized;
 
@@ -22,10 +23,11 @@ public class PlayerView : MonoBehaviour
         _playerWeaponView = GetComponent<PlayerWeaponView>();
     }
 
-    public void Init(PlayerWeaponPresenter playerWeaponPresenter, IInputsHandler inputsHandler)
+    public void Init(MultiplayerHandler multiplayerHandler, PlayerWeaponPresenter playerWeaponPresenter, IInputsHandler inputsHandler)
     {
         gameObject.SetActive(false);
 
+        _multiplayerHandler = multiplayerHandler;
         _inputsHandler = inputsHandler;
         _isInitialized = true;
         _playerWeaponView.Init(playerWeaponPresenter);
@@ -42,6 +44,7 @@ public class PlayerView : MonoBehaviour
         _playerCameraRotation.RotationXChanged += OnRotationXChanged;
         _playerWeaponView.WeaponAdded += OnWeaponAdded;
         _playerWeaponView.WeaponSwitched += OnWeaponSwitched;
+        _playerWeaponView.Shooted += OnShoot;
     }
 
     private void OnDisable()
@@ -53,6 +56,7 @@ public class PlayerView : MonoBehaviour
         _playerCameraRotation.RotationXChanged -= OnRotationXChanged;
         _playerWeaponView.WeaponAdded -= OnWeaponAdded;
         _playerWeaponView.WeaponSwitched -= OnWeaponSwitched;
+        _playerWeaponView.Shooted -= OnShoot;
     }
 
     private void Update()
@@ -118,26 +122,27 @@ public class PlayerView : MonoBehaviour
         }
 
         MovementData movementData = new(position, _playerMovement.MoveDirection);
-        MultiplayerHandler.Instance.SendPlayerPosition("Move", movementData);
+        MultiplayerHandler.Instance.SendPlayerData("Move", movementData);
         _pingTimer = 0;
     }
 
     private void OnRotationXChanged(Vector3 rotation)
     {
-        MultiplayerHandler.Instance.SendPlayerData("Rotate", rotation);
+        _multiplayerHandler.SendPlayerData("Rotate", rotation);
     }
 
     private void OnWeaponAdded(string prefabPath)
     {
-        AddedWeaponData addedWeaponData = new(MultiplayerHandler.Instance.ClientId, prefabPath);
-        string jsonData = JsonUtility.ToJson(addedWeaponData);
-        MultiplayerHandler.Instance.SendPlayerData("AddWeapon", prefabPath);
+        _multiplayerHandler.SendPlayerData("AddWeapon", prefabPath);
     }
 
     private void OnWeaponSwitched(int weaponIndex)
     {
-        SwitchedWeaponData switchedWeaponData = new(MultiplayerHandler.Instance.ClientId, weaponIndex);
-        string jsonData = JsonUtility.ToJson(switchedWeaponData);
-        MultiplayerHandler.Instance.SendPlayerData("SwitchWeapon", weaponIndex);
+        _multiplayerHandler.SendPlayerData("SwitchWeapon", weaponIndex);
+    }
+
+    private void OnShoot()
+    {
+        _multiplayerHandler.SendPlayerData("OnShoot", _multiplayerHandler.ClientId);
     }
 }

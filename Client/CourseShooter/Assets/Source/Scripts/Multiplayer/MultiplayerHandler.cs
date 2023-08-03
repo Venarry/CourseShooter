@@ -1,6 +1,7 @@
 using Colyseus;
 using UnityEngine;
 using System.Collections.Generic;
+using System;
 
 public class MultiplayerHandler : ColyseusManager<MultiplayerHandler>
 {
@@ -14,11 +15,6 @@ public class MultiplayerHandler : ColyseusManager<MultiplayerHandler>
     public void InitClient()
     {
         Instance.InitializeClient();
-    }
-
-    public void SendPlayerPosition(string key, MovementData movementData)
-    {
-        _room.Send(key, movementData);
     }
 
     public void SendPlayerData(string key, object data)
@@ -36,8 +32,15 @@ public class MultiplayerHandler : ColyseusManager<MultiplayerHandler>
         _room.State.players.OnAdd += SpawnHero;
         _room.State.players.OnRemove += RemoveHero;
 
-        //_room.OnMessage<string>("WeaponAdded", OnWeaponAdded);
-        //_room.OnMessage<string>("WeaponSwitched", OnWeaponSwitched);
+        _room.OnMessage<string>("Shoot", OnShoot);
+    }
+
+    private void OnShoot(string ownerId)
+    {
+        if (_enemys.ContainsKey(ownerId) == false)
+            return;
+
+        _enemys[ownerId].Shoot();
     }
 
     public void LeaveRoom()
@@ -68,7 +71,8 @@ public class MultiplayerHandler : ColyseusManager<MultiplayerHandler>
 
     private void SpawnPlayer(Player player)
     {
-        _playerFactory.Create(new Vector3(player.Position.x, 0, player.Position.z));
+        Vector3 spawnPosition = new(player.Position.x, player.Position.y, player.Position.z);
+        _playerFactory.Create(this, spawnPosition);
     }
 
     private void SpawnEnemy(string key, Player player)

@@ -3,14 +3,19 @@ using UnityEngine;
 public abstract class WeaponView : MonoBehaviour
 {
     [SerializeField] protected int Damage;
+    [SerializeField] private float _cooldown;
     private Transform _parent;
+    private float _timeAfterShoot;
 
     public string PrefabPath { get; private set; }
+    protected bool IsReadyToShoot => _timeAfterShoot > _cooldown;
 
-    public abstract void Shoot();
+    public abstract bool TryShoot();
 
     public void Update()
     {
+        _timeAfterShoot += Time.deltaTime;
+
         if (_parent == null)
             return;
 
@@ -38,5 +43,10 @@ public abstract class WeaponView : MonoBehaviour
     public void Hide()
     {
         gameObject.SetActive(false);
+    }
+
+    protected void ResetShootTime()
+    {
+        _timeAfterShoot = 0;
     }
 }

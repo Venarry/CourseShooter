@@ -11,6 +11,7 @@ public class PlayerWeaponView : MonoBehaviour
 
     public event Action<string> WeaponAdded;
     public event Action<int> WeaponSwitched;
+    public event Action Shooted;
 
     public void Init(PlayerWeaponPresenter playerWeaponPresenter)
     {
@@ -47,7 +48,10 @@ public class PlayerWeaponView : MonoBehaviour
         if (_activeWeapon == null)
             return;
 
-        _activeWeapon.Shoot();
+        if (_activeWeapon.TryShoot() == false)
+            return;
+
+        Shooted?.Invoke();
     }
 
     public void AddWeapon(WeaponView weaponView, bool haveSwitch)

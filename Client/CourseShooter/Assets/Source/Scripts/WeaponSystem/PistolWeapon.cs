@@ -1,11 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PistolWeapon : WeaponView
 {
-    public override void Shoot()
+    public override bool TryShoot()
     {
         Debug.Log("pistol shoot");
+        return true;
     }
 }

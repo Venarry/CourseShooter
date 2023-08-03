@@ -68,6 +68,11 @@ public class EnemyView : MonoBehaviour
         _myPlayer.OnChange -= OnActiveWeaponChange;
     }
 
+    public void Shoot()
+    {
+        _playerWeaponView.Shoot();
+    }
+
     private void OnPositionChange(List<DataChange> changes)
     {
         Vector3 targetPosition = transform.position;

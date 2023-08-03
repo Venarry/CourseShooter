@@ -1,11 +1,21 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class MinigunWeapon : WeaponView
 {
-    public override void Shoot()
+    [SerializeField] private Transform _shootPoint;
+    private BulletsFactory _bulletsFactory;
+
+    private void Awake()
     {
-        Debug.Log("Minigun Shoot");
+        _bulletsFactory = new();
+    }
+
+    public override bool TryShoot()
+    {
+        if (IsReadyToShoot == false)
+            return false;
+
+        _bulletsFactory.CreateSphereBullet(_shootPoint, Damage);
+        return true;
     }
 }

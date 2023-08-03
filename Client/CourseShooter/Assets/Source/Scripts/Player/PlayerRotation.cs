@@ -12,8 +12,11 @@ public class PlayerRotation : MonoBehaviour
 
     public void Rotate()
     {
-        _camera.transform.localRotation = Quaternion.Euler(_currentRotation.x, 0, 0);
-        transform.rotation = Quaternion.Euler(0, _currentRotation.y, 0);
+        //_camera.transform.localRotation = Quaternion.Euler(_currentRotation.x, 0, 0);
+        //transform.rotation = Quaternion.Euler(0, _currentRotation.y, 0);
+
+        _camera.transform.localEulerAngles = new Vector3(_currentRotation.x, 0, 0);
+        transform.eulerAngles = new Vector3(0, _currentRotation.y, 0);
         _currentRotation.y = transform.localRotation.eulerAngles.y;
 
         RotationXChanged?.Invoke(_currentRotation);
