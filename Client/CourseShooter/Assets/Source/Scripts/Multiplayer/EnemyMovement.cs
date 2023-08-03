@@ -42,12 +42,6 @@ public class EnemyMovement : MonoBehaviour
         _moveDirection = moveDirection;
     }
 
-    private void InterpolateWithLerp()
-    {
-        float interpolationMultiplier = 0.25f;
-        transform.position = Vector3.Lerp(transform.position, _newPosition, interpolationMultiplier);
-    }
-
     private void InterpolateWithSmallPredicate()
     {
         float interpolationMultiplier = 0.25f;
@@ -57,8 +51,8 @@ public class EnemyMovement : MonoBehaviour
     private void InterpolateWithPredicate()
     {
         float interpolationMultiplier = 0.25f;
-        transform.position = Vector3.Lerp(transform.position, _newPosition, interpolationMultiplier); 
         _newPosition += _moveDirection;
+        transform.position = Vector3.Lerp(transform.position, _newPosition, interpolationMultiplier); 
     }
 
     private void InterpolateWithPredicateCharacterController()

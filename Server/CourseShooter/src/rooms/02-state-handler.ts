@@ -1,5 +1,5 @@
 import { Room, Client } from "colyseus";
-import { Schema, type, MapSchema } from "@colyseus/schema";
+import { Schema, type, MapSchema, ArraySchema } from "@colyseus/schema";
 
 export class MyVector3 extends Schema
 {
@@ -40,6 +40,12 @@ export class Player extends Schema
     @type(MyVector3)
     Rotation = new MyVector3();
 
+    @type([ "string" ]) 
+    WeaponPaths = new ArraySchema<string>();
+
+    @type("number")
+    ActiveWeapon: number;
+
     SetMoveData(newMovemetData: any)
     {
         this.Position.SetValues(newMovemetData.Position);
@@ -49,6 +55,16 @@ export class Player extends Schema
     SetRotation(targetRotation: any)
     {
         this.Rotation.SetValues(targetRotation);
+    }
+
+    AddWeapon(weaponPath: string)
+    {
+        this.WeaponPaths.push(weaponPath);
+    }
+
+    SwitchWeapon(index: number)
+    {
+        this.ActiveWeapon = index;
     }
 }
 
@@ -73,6 +89,16 @@ export class State extends Schema {
     {
         this.players.get(sessionId).SetRotation(targetRotation);
     }
+
+    AddWeapon(sessionId: string, weaponPath: string)
+    {
+        this.players.get(sessionId).AddWeapon(weaponPath);
+    }
+
+    SwitchWeapon(sessionId: string, index: number)
+    {
+        this.players.get(sessionId).SwitchWeapon(index);
+    }
 }
 
 export class StateHandlerRoom extends Room<State> {
@@ -92,6 +118,18 @@ export class StateHandlerRoom extends Room<State> {
         {
             this.state.RotatePlayer(client.sessionId, data);
         });
+
+        this.onMessage("AddWeapon", (client, data) => 
+        {
+            //this.broadcast("WeaponAdded", data, {except: client});
+            this.state.AddWeapon(client.sessionId, data);
+        });
+
+        this.onMessage("SwitchWeapon", (client, data) => 
+        {
+            //this.broadcast("WeaponSwitched", data, {except: client});
+            this.state.SwitchWeapon(client.sessionId, data);
+        });
     }
 
     onAuth(client, options, req) {
@@ -110,5 +148,4 @@ export class StateHandlerRoom extends Room<State> {
     onDispose () {
         console.log("Dispose StateHandlerRoom");
     }
-
 }

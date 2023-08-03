@@ -6,6 +6,11 @@ public class Bootstrapper : MonoBehaviour
 
     private void Awake()
     {
+        
+    }
+
+    private void Start()
+    {
         _multiplayerHolder.InitClient();
         _multiplayerHolder.JoinRoom();
     }

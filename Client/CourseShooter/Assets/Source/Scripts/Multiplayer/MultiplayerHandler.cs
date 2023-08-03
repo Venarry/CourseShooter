@@ -9,6 +9,8 @@ public class MultiplayerHandler : ColyseusManager<MultiplayerHandler>
     private PlayerFactory _playerFactory;
     private EnemyFactory _enemyFactory;
 
+    public string ClientId => _room.SessionId;
+
     public void InitClient()
     {
         Instance.InitializeClient();
@@ -30,13 +32,20 @@ public class MultiplayerHandler : ColyseusManager<MultiplayerHandler>
         _enemyFactory = new();
 
         _room = await client.JoinOrCreate<State>("state_handler");
+
         _room.State.players.OnAdd += SpawnHero;
         _room.State.players.OnRemove += RemoveHero;
+
+        //_room.OnMessage<string>("WeaponAdded", OnWeaponAdded);
+        //_room.OnMessage<string>("WeaponSwitched", OnWeaponSwitched);
     }
 
     public void LeaveRoom()
     {
         _room.Leave();
+
+        _room.State.players.OnAdd -= SpawnHero;
+        _room.State.players.OnRemove -= RemoveHero;
     }
 
     private void SpawnHero(string key, Player player)
@@ -64,11 +73,7 @@ public class MultiplayerHandler : ColyseusManager<MultiplayerHandler>
 
     private void SpawnEnemy(string key, Player player)
     {
-        EnemyView enemy = _enemyFactory.Create(new Vector3(player.Position.x, 0, player.Position.z));
+        EnemyView enemy = _enemyFactory.Create(player);
         _enemys.Add(key, enemy);
-
-        player.Position.OnChange += enemy.OnPositionChange;
-        player.Direction.OnChange += enemy.OnDirectionChange;
-        player.Rotation.OnChange += enemy.OnRotationChange;
     }
 }

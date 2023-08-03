@@ -9,54 +9,39 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float _gravity = 0.03f;
 
     private CharacterController _characterController;
-    private IInputsHandler _inputsHandler;
-
+    private Vector3 _inputAxis;
     private Vector3 _moveDirection;
     private Vector3 _localVelocity;
     private float _gravityForce;
     private bool _isStayOnGound;
 
-    public event Action<Vector3> DataChanged;
+    public event Action<Vector3> PositionChanged;
 
-    public Vector3 Velocity => _moveDirection;
+    public Vector3 MoveDirection => _moveDirection;
 
     private void Awake()
     {
         _characterController = GetComponent<CharacterController>();
     }
 
-    public void Init(IInputsHandler inputsHandler)
+    public void Move()
     {
-        _inputsHandler = inputsHandler;
-    }
-
-    public void FixedUpdate()
-    {
-        Vector3 previousVelocity = Velocity;
-
-        RefreshMoveDirection();
+        Vector3 previousVelocity = _characterController.velocity;
         _characterController.Move(_moveDirection);
         ReduceGravityForce();
 
-        Vector3 currentVelocity = Velocity;
+        Vector3 currentVelocity = _characterController.velocity;
 
-        if(previousVelocity != currentVelocity)
+        if (previousVelocity != currentVelocity)
         {
-            DataChanged?.Invoke(transform.position);
+            PositionChanged?.Invoke(transform.position);
         }
-
-        Debug.Log(Mathf.Sign(_moveDirection.normalized.z));
-        Debug.Log(_moveDirection.magnitude);
     }
 
-    private void Update()
+    public void SetMoveDirection(Vector3 direction)
     {
-        TryJump();
-    }
-
-    public void RefreshMoveDirection()
-    {
-        _moveDirection = _inputsHandler.MoveDirection;
+        _inputAxis = direction;
+        _moveDirection = direction;
         _moveDirection = _moveDirection.normalized;
         _moveDirection *= _speed;
         _moveDirection += _localVelocity;
@@ -67,7 +52,7 @@ public class PlayerMovement : MonoBehaviour
 
     public void TryJump()
     {
-        if (_characterController.isGrounded && _inputsHandler.IsPressedKeyJump)
+        if (_characterController.isGrounded)
         {
             _gravityForce = _jumpStrength;
             _isStayOnGound = false;
@@ -88,10 +73,10 @@ public class PlayerMovement : MonoBehaviour
         {
             if (_isStayOnGound)
             {
-                Vector3 moveDirection = _inputsHandler.MoveDirection;
                 float stepSpeedMultiplier = 0.4f;
+                float targetSpeed = _speed * stepSpeedMultiplier;
 
-                _localVelocity += new Vector3(moveDirection.x * _speed * stepSpeedMultiplier, 0, moveDirection.z * _speed * stepSpeedMultiplier);
+                _localVelocity += new Vector3(_inputAxis.x * targetSpeed, 0, _inputAxis.z * targetSpeed);
                 _gravityForce = 0;
                 _isStayOnGound = false;
             }
