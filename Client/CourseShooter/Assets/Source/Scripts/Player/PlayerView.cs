@@ -66,10 +66,10 @@ public class PlayerView : MonoBehaviour
         ProcessJump();
         ProcessShooting();
 
-        if (Input.GetKeyDown(KeyCode.E))
+        /*if (Input.GetKeyDown(KeyCode.E))
         {
             AddWeapon(new WeaponFactory().Create(ResourcesPath.Minigun));
-        }
+        }*/
     }
 
     private void FixedUpdate()
@@ -116,14 +116,14 @@ public class PlayerView : MonoBehaviour
 
     private void OnMovementDataChanged(Vector3 position)
     {
-        if (_pingTimer < 0f)
+        /*if (_pingTimer < 0f)
         {
             return;
         }
+        _pingTimer = 0;*/
 
         MovementData movementData = new(position, _playerMovement.MoveDirection);
         MultiplayerHandler.Instance.SendPlayerData("Move", movementData);
-        _pingTimer = 0;
     }
 
     private void OnRotationXChanged(Vector3 rotation)

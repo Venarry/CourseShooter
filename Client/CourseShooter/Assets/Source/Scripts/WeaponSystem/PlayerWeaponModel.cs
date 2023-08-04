@@ -26,8 +26,6 @@ public class PlayerWeaponModel
         {
             weapon.Hide();
         }
-
-        
     }
 
     public void RemoveWeapon(WeaponView weapon)

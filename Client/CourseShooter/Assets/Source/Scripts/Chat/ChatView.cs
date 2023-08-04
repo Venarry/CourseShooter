@@ -9,7 +9,6 @@ public class ChatView : MonoBehaviour
     [SerializeField] private TMP_Text _messagePrefab;
 
     private ChatPresenter _chatPresenter;
-    public event Action<string> MessageSubmited;
 
     private void Awake()
     {
@@ -37,7 +36,6 @@ public class ChatView : MonoBehaviour
 
     public void ShowMessage(string message)
     {
-        
         TMP_Text spawnedMessage = Instantiate(_messagePrefab, Vector3.zero, Quaternion.identity);
         spawnedMessage.transform.SetParent(_messagePoint, true);
         spawnedMessage.transform.localScale = Vector3.one;
