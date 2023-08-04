@@ -135,6 +135,11 @@ export class StateHandlerRoom extends Room<State> {
         {
             this.broadcast("Shoot", data, {except: client});
         });
+
+        this.onMessage("MessageSent", (client, data) => 
+        {
+            this.broadcast("MessageSent", data);
+        });
     }
 
     onAuth(client, options, req) {

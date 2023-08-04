@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 5199357533722066782}
   - component: {fileID: 5199357533722066787}
   - component: {fileID: 5199357533722066784}
-  - component: {fileID: 5199357533722066785}
   m_Layer: 0
   m_Name: Sphere
   m_TagString: Untagged
@@ -84,19 +83,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!135 &5199357533722066785
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5199357533722066783}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &5199357535033923563
 GameObject:
   m_ObjectHideFlags: 0
@@ -108,6 +94,7 @@ GameObject:
   - component: {fileID: 5199357535033923562}
   - component: {fileID: 5199357535033923564}
   - component: {fileID: 5199357535033923565}
+  - component: {fileID: 4659839465062259795}
   m_Layer: 0
   m_Name: SphereBullet
   m_TagString: Untagged
@@ -159,3 +146,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d11e5daed0946f498c201dadde339d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!65 &4659839465062259795
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5199357535033923563}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.1, y: 0.1, z: 0.1}
+  m_Center: {x: 0, y: 0, z: 0}

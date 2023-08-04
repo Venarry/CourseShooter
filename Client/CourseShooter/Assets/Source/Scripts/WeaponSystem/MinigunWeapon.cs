@@ -16,6 +16,7 @@ public class MinigunWeapon : WeaponView
             return false;
 
         _bulletsFactory.CreateSphereBullet(_shootPoint, Damage);
+        ResetShootTime();
         return true;
     }
 }

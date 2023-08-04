@@ -9,8 +9,14 @@ public class MultiplayerHandler : ColyseusManager<MultiplayerHandler>
     private readonly Dictionary<string, EnemyView> _enemys = new();
     private PlayerFactory _playerFactory;
     private EnemyFactory _enemyFactory;
+    private ChatView _chatView;
 
     public string ClientId => _room.SessionId;
+
+    public void Init(ChatView chatView)
+    {
+        _chatView = chatView;
+    }
 
     public void InitClient()
     {
@@ -33,6 +39,12 @@ public class MultiplayerHandler : ColyseusManager<MultiplayerHandler>
         _room.State.players.OnRemove += RemoveHero;
 
         _room.OnMessage<string>("Shoot", OnShoot);
+        _room.OnMessage<string>("MessageSent", OnMessageSent);
+    }
+
+    private void OnMessageSent(string message)
+    {
+        _chatView.SentMessage(message);
     }
 
     private void OnShoot(string ownerId)
