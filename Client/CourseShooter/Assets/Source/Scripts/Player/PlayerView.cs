@@ -14,20 +14,19 @@ public class PlayerView : MonoBehaviour
     private IInputsHandler _inputsHandler;
     private bool _isInitialized;
 
-    private float _pingTimer;
-
     private void Awake()
     {
         _playerMovement = GetComponent<PlayerMovement>();
         _playerCameraRotation = GetComponent<PlayerRotation>();
         _playerWeaponView = GetComponent<PlayerWeaponView>();
+        MapSettings.HideCursor();
     }
 
     public void Init(MultiplayerHandler multiplayerHandler, PlayerWeaponPresenter playerWeaponPresenter, IInputsHandler inputsHandler)
     {
         gameObject.SetActive(false);
 
-        _multiplayerHandler = multiplayerHandler;
+        _multiplayerHandler = multiplayerHandler; // не нужно
         _inputsHandler = inputsHandler;
         _isInitialized = true;
         _playerWeaponView.Init(playerWeaponPresenter);
@@ -61,19 +60,26 @@ public class PlayerView : MonoBehaviour
 
     private void Update()
     {
-        _pingTimer += Time.deltaTime;
+        if (PauseHandler.IsPaused == true)
+            return;
 
         ProcessJump();
         ProcessShooting();
-
-        /*if (Input.GetKeyDown(KeyCode.E))
-        {
-            AddWeapon(new WeaponFactory().Create(ResourcesPath.Minigun));
-        }*/
     }
 
     private void FixedUpdate()
     {
+        if (PauseHandler.IsPaused == false)
+        {
+            _playerMovement.SetMoveDirection(_inputsHandler.MoveDirection);
+            _playerCameraRotation.AddRotationAxis(_inputsHandler.RotationDirection);
+        }
+        else
+        {
+            _playerMovement.SetMoveDirection(Vector3.zero);
+            _playerCameraRotation.AddRotationAxis(Vector3.zero);
+        }
+
         ProcessMovement();
         ProcessRotation();
     }
@@ -91,12 +97,10 @@ public class PlayerView : MonoBehaviour
 
     private void ProcessMovement()
     {
-        _playerMovement.SetMoveDirection(_inputsHandler.MoveDirection);
         _playerMovement.Move();
     }
     private void ProcessRotation()
     {
-        _playerCameraRotation.AddRotationAxis(_inputsHandler.RotationDirection);
         _playerCameraRotation.Rotate();
     }
 
@@ -116,12 +120,6 @@ public class PlayerView : MonoBehaviour
 
     private void OnMovementDataChanged(Vector3 position)
     {
-        /*if (_pingTimer < 0f)
-        {
-            return;
-        }
-        _pingTimer = 0;*/
-
         MovementData movementData = new(position, _playerMovement.MoveDirection);
         MultiplayerHandler.Instance.SendPlayerData("Move", movementData);
     }

@@ -1,4 +1,4 @@
-import { Room, Client } from "colyseus";
+import { Room, Client, ClientState } from "colyseus";
 import { Schema, type, MapSchema, ArraySchema } from "@colyseus/schema";
 
 export class MyVector3 extends Schema
@@ -31,8 +31,21 @@ export class MyVector3 extends Schema
 
 export class Player extends Schema 
 {
+    constructor(sessionId = "") 
+    {
+        super();
+
+        this.Name = `User№${sessionId}`;
+    }
+
+    @type("string")
+    Name;
+
+    @type("number")
+    SpawnPointIndex = Math.floor(Math.random() * 2);
+
     @type(MyVector3)
-    Position = new MyVector3(Math.floor(Math.random() * 7 - 3.5), 0, Math.floor(Math.random() * 7 - 3.5));
+    Position = new MyVector3(); //Math.floor(Math.random() * 7 - 3.5)
 
     @type(MyVector3)
     Direction = new MyVector3();
@@ -73,7 +86,7 @@ export class State extends Schema {
     players = new MapSchema<Player>();
 
     createPlayer(sessionId: string) {
-        this.players.set(sessionId, new Player());
+        this.players.set(sessionId, new Player(sessionId));
     }
 
     removePlayer(sessionId: string) {
@@ -138,7 +151,7 @@ export class StateHandlerRoom extends Room<State> {
 
         this.onMessage("MessageSent", (client, data) => 
         {
-            this.broadcast("MessageSent", data);
+            this.broadcast("MessageSent", `[${this.state.players.get(client.sessionId).Name}] ${data}`);
         });
     }
 

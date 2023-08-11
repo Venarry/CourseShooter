@@ -1,6 +1,7 @@
 using Colyseus.Schema;
 using System;
 using System.Collections.Generic;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -18,6 +19,7 @@ public class EnemyView : MonoBehaviour
 
     private Vector3 _moveDirection = Vector3.zero;
     private bool _isInitialized;
+    private bool _isFirstDataUpdate = true;
 
     private void Awake()
     {
@@ -73,12 +75,17 @@ public class EnemyView : MonoBehaviour
         _playerWeaponView.Shoot();
     }
 
+    public void SetMovePosition(Vector3 targetPosition)
+    {
+        _enemyMovement.SetTargetPosition(targetPosition);
+    }
+
     private void OnPositionChange(List<DataChange> changes)
     {
         Vector3 targetPosition = transform.position;
         targetPosition = ApplyVectorChanges(changes, targetPosition);
 
-        _enemyMovement.SetMovePosition(targetPosition);
+        _enemyMovement.SetTargetPosition(targetPosition);
     }
 
     private void OnDirectionChange(List<DataChange> changes)

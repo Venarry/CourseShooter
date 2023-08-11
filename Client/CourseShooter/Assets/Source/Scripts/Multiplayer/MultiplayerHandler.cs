@@ -10,12 +10,14 @@ public class MultiplayerHandler : ColyseusManager<MultiplayerHandler>
     private PlayerFactory _playerFactory;
     private EnemyFactory _enemyFactory;
     private ChatView _chatView;
+    private PlayerSpawner _playerSpawner;
 
     public string ClientId => _room.SessionId;
 
-    public void Init(ChatView chatView)
+    public void Init(ChatView chatView, PlayerSpawner playerSpawner)
     {
         _chatView = chatView;
+        _playerSpawner = playerSpawner;
     }
 
     public void InitClient()
@@ -84,12 +86,14 @@ public class MultiplayerHandler : ColyseusManager<MultiplayerHandler>
     private void SpawnPlayer(Player player)
     {
         Vector3 spawnPosition = new(player.Position.x, player.Position.y, player.Position.z);
-        _playerFactory.Create(this, spawnPosition);
+        //_playerFactory.Create(this, spawnPosition);
+        _playerSpawner.SpawnPlayer((int)player.SpawnPointIndex);
     }
 
     private void SpawnEnemy(string key, Player player)
     {
-        EnemyView enemy = _enemyFactory.Create(player);
+        //EnemyView enemy = _enemyFactory.Create(player);
+        EnemyView enemy = _playerSpawner.SpawnEnemy(player);
         _enemys.Add(key, enemy);
     }
 }

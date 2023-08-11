@@ -7,7 +7,7 @@ public class EnemyMovement : MonoBehaviour
     private CharacterController _characterController;
 
     private Vector3 _moveDirection = Vector3.zero;
-    private Vector3 _newPosition = Vector3.zero;
+    private Vector3 _targetPosition = Vector3.zero;
 
     public event Action<bool> GroundedStateChanged;
     public event Action<Vector3> MoveDirectionChanged;
@@ -30,9 +30,14 @@ public class EnemyMovement : MonoBehaviour
         MoveDirectionChanged?.Invoke(_characterController.velocity);
     }
 
-    public void SetMovePosition(Vector3 newPosition)
+    public void SetTargetPosition(Vector3 targetPosition)
     {
-        _newPosition = newPosition;
+        _targetPosition = targetPosition;
+    }
+
+    public void SetPosition(Vector3 position)
+    {
+        transform.position = position;
     }
 
     public void SetMoveDirection(Vector3 moveDirection)
@@ -43,20 +48,20 @@ public class EnemyMovement : MonoBehaviour
     private void InterpolateWithSmallPredicate()
     {
         float interpolationMultiplier = 0.25f;
-        transform.position = Vector3.Lerp(transform.position, _newPosition + _moveDirection, interpolationMultiplier);
+        transform.position = Vector3.Lerp(transform.position, _targetPosition + _moveDirection, interpolationMultiplier);
     }
 
     private void InterpolateWithPredicate()
     {
         float interpolationMultiplier = 0.25f;
-        _newPosition += _moveDirection;
-        transform.position = Vector3.Lerp(transform.position, _newPosition, interpolationMultiplier); 
+        _targetPosition += _moveDirection;
+        transform.position = Vector3.Lerp(transform.position, _targetPosition, interpolationMultiplier); 
     }
 
     private void InterpolateWithPredicateCharacterController()
     {
         float interpolationMultiplier = 0.4f;
-        _newPosition += _moveDirection;
-        _characterController.Move(_newPosition - Vector3.Lerp(transform.position, _newPosition, interpolationMultiplier));
+        _targetPosition += _moveDirection;
+        _characterController.Move(_targetPosition - Vector3.Lerp(transform.position, _targetPosition, interpolationMultiplier));
     }
 }
