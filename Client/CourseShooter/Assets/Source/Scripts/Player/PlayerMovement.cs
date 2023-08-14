@@ -25,6 +25,20 @@ public class PlayerMovement : MonoBehaviour
         _characterController = GetComponent<CharacterController>();
     }
 
+    public void SetBehaviourState(bool state)
+    {
+        _characterController.enabled = state;
+    }
+
+    public void SetPosition(Vector3 position)
+    {
+        _characterController.enabled = false;
+        _characterController.transform.position = position;
+        _characterController.enabled = true;
+
+        PositionChanged?.Invoke(transform.position);
+    }
+
     public void Move()
     {
         Vector3 previousVelocity = _characterController.velocity;

@@ -11,7 +11,7 @@ public class PauseHandler
 
     public static void RemovePauseLevel()
     {
-        if (_pauseLevelCounter < 0)
+        if (_pauseLevelCounter <= 0)
             return;
 
         _pauseLevelCounter--;

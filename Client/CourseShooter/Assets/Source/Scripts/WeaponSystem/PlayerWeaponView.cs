@@ -43,12 +43,12 @@ public class PlayerWeaponView : MonoBehaviour
         _playerWeaponPresenter.WeaponSwitched -= OnWeaponSwitched;
     }
 
-    public void Shoot()
+    public void Shoot(OwnerData ownerData)
     {
         if (_activeWeapon == null)
             return;
 
-        if (_activeWeapon.TryShoot() == false)
+        if (_activeWeapon.TryShoot(ownerData) == false)
             return;
 
         Shooted?.Invoke();

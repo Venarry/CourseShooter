@@ -10,16 +10,16 @@ public abstract class WeaponView : MonoBehaviour
     public string PrefabPath { get; private set; }
     protected bool IsReadyToShoot => _timeAfterShoot > _cooldown;
 
-    public abstract bool TryShoot();
+    public abstract bool TryShoot(OwnerData ownerData);
 
     public void Update()
     {
         _timeAfterShoot += Time.deltaTime;
 
-        if (_parent == null)
+        /*if (_parent == null)
             return;
 
-        //transform.SetPositionAndRotation(_parent.position, _parent.rotation);
+        transform.SetPositionAndRotation(_parent.position, _parent.rotation);*/
     }
 
     public void SetPath(string path)

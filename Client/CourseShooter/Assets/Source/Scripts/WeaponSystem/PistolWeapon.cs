@@ -10,7 +10,7 @@ public class PistolWeapon : WeaponView
         _bulletsFactory = new();
     }
 
-    public override bool TryShoot()
+    public override bool TryShoot(OwnerData ownerData)
     {
         if (IsReadyToShoot == false)
             return false;

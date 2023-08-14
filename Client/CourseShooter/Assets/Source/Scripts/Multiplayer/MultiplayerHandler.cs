@@ -1,23 +1,31 @@
 using Colyseus;
 using UnityEngine;
 using System.Collections.Generic;
-using System;
 
 public class MultiplayerHandler : ColyseusManager<MultiplayerHandler>
 {
     private ColyseusRoom<State> _room;
     private readonly Dictionary<string, EnemyView> _enemys = new();
-    private PlayerFactory _playerFactory;
     private EnemyFactory _enemyFactory;
     private ChatView _chatView;
-    private PlayerSpawner _playerSpawner;
+    private SpawnPointsDataSource _playerSpawner;
+    private PlayerFactory _playerFactory;
+    private Camera _diedFollowCamera;
+    private MapScoreView _mapScoreView;
 
-    public string ClientId => _room.SessionId;
+    private Vector3 _spawnPosition;
+    private int _currentTeamIndex;
 
-    public void Init(ChatView chatView, PlayerSpawner playerSpawner)
+    public string SessionId => _room.SessionId;
+
+    public void Init(ChatView chatView, SpawnPointsDataSource playerSpawner, Camera diedFollowCamera, MapScoreView mapScoreView)
     {
+        _playerFactory = new();
+        _enemyFactory = new();
         _chatView = chatView;
         _playerSpawner = playerSpawner;
+        _diedFollowCamera = diedFollowCamera;
+        _mapScoreView = mapScoreView;
     }
 
     public void InitClient()
@@ -32,13 +40,22 @@ public class MultiplayerHandler : ColyseusManager<MultiplayerHandler>
 
     public async void JoinRoom()
     {
-        _playerFactory = new();
-        _enemyFactory = new();
+        TeamsDataSource teamsDataSource = new(teamsCount: 2);
 
-        _room = await client.JoinOrCreate<State>("state_handler");
+        _currentTeamIndex = Random.Range(0, 2); //teamsDataSource.AddPlayerToSmallestTeam();
+        _spawnPosition = _playerSpawner.GetRandomSpawnPosition(_currentTeamIndex);
+
+        Dictionary<string, object> startPlayerData = new()
+        {
+            { "Position", new MyVector3(_spawnPosition) },
+            { "TeamIndex", _currentTeamIndex }
+        };
+
+        _room = await client.JoinOrCreate<State>("state_handler", startPlayerData);
 
         _room.State.players.OnAdd += SpawnHero;
         _room.State.players.OnRemove += RemoveHero;
+        _room.State.Score.OnAdd += _mapScoreView.OnScoreAdd;
 
         _room.OnMessage<string>("Shoot", OnShoot);
         _room.OnMessage<string>("MessageSent", OnMessageSent);
@@ -54,7 +71,8 @@ public class MultiplayerHandler : ColyseusManager<MultiplayerHandler>
         if (_enemys.ContainsKey(ownerId) == false)
             return;
 
-        _enemys[ownerId].Shoot();
+        OwnerData ownerData = new(_enemys[ownerId].TeamIndex);
+        _enemys[ownerId].Shoot(ownerData);
     }
 
     public void LeaveRoom()
@@ -85,15 +103,12 @@ public class MultiplayerHandler : ColyseusManager<MultiplayerHandler>
 
     private void SpawnPlayer(Player player)
     {
-        Vector3 spawnPosition = new(player.Position.x, player.Position.y, player.Position.z);
-        //_playerFactory.Create(this, spawnPosition);
-        _playerSpawner.SpawnPlayer((int)player.SpawnPointIndex);
+        _playerFactory.Create(multiplayerHandler: this, _playerSpawner, _diedFollowCamera, _spawnPosition, _currentTeamIndex, isMultiplayer: true);
     }
 
     private void SpawnEnemy(string key, Player player)
     {
-        //EnemyView enemy = _enemyFactory.Create(player);
-        EnemyView enemy = _playerSpawner.SpawnEnemy(player);
+        EnemyView enemy = _enemyFactory.Create(player);
         _enemys.Add(key, enemy);
     }
 }

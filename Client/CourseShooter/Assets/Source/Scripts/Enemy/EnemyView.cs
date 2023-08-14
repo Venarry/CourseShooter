@@ -1,7 +1,5 @@
 using Colyseus.Schema;
-using System;
 using System.Collections.Generic;
-using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -9,17 +7,21 @@ using UnityEngine;
 [RequireComponent(typeof(EnemyAnimation))]
 [RequireComponent(typeof(EnemyRotation))]
 [RequireComponent(typeof(PlayerWeaponView))]
-public class EnemyView : MonoBehaviour
+[RequireComponent(typeof(ProgressBar))]
+public class EnemyView : MonoBehaviour, IDamageable
 {
     private EnemyMovement _enemyMovement;
     private EnemyAnimation _enemyAnimation;
     private EnemyRotation _enemyRotation;
     private PlayerWeaponView _playerWeaponView;
+    private HealthPresenter _healthPresenter;
+    private ProgressBar _progressBar;
     private Player _myPlayer;
 
     private Vector3 _moveDirection = Vector3.zero;
     private bool _isInitialized;
-    private bool _isFirstDataUpdate = true;
+
+    public int TeamIndex { get; private set; }
 
     private void Awake()
     {
@@ -27,15 +29,17 @@ public class EnemyView : MonoBehaviour
         _enemyAnimation = GetComponent<EnemyAnimation>();
         _enemyRotation = GetComponent<EnemyRotation>();
         _playerWeaponView = GetComponent<PlayerWeaponView>();
+        _progressBar = GetComponent<ProgressBar>();
     }
 
-    public void Init(PlayerWeaponPresenter playerWeaponPresenter, Player myPlayer)
+    public void Init(HealthPresenter healthPresenter, Player myPlayer)
     {
         gameObject.SetActive(false);
 
         _myPlayer = myPlayer;
+        _healthPresenter = healthPresenter;
+        _progressBar.SetValue(_healthPresenter.HealthNormalized);
         _isInitialized = true;
-        _playerWeaponView.Init(playerWeaponPresenter);
 
         gameObject.SetActive(true);
     }
@@ -45,14 +49,16 @@ public class EnemyView : MonoBehaviour
         if (_isInitialized == false)
             return;
 
+        _healthPresenter.Enable();
         _enemyMovement.GroundedStateChanged += OnGroundedChanged;
         _enemyMovement.MoveDirectionChanged += OnVelocityChanged;
+        _healthPresenter.HealthChanged += OnHealthChanged;
 
         _myPlayer.Position.OnChange += OnPositionChange;
         _myPlayer.Direction.OnChange += OnDirectionChange;
         _myPlayer.Rotation.OnChange += OnRotationChange;
         _myPlayer.WeaponPaths.OnAdd += OnWeaponPathsAdded;
-        _myPlayer.OnChange += OnActiveWeaponChange;
+        _myPlayer.OnChange += OnDataChange;
     }
 
     private void OnDisable()
@@ -60,24 +66,41 @@ public class EnemyView : MonoBehaviour
         if (_isInitialized == false)
             return;
 
+        _healthPresenter.Disable();
         _enemyMovement.GroundedStateChanged -= OnGroundedChanged;
         _enemyMovement.MoveDirectionChanged -= OnVelocityChanged;
+        _healthPresenter.HealthChanged -= OnHealthChanged;
 
         _myPlayer.Position.OnChange -= OnPositionChange;
         _myPlayer.Direction.OnChange -= OnDirectionChange;
         _myPlayer.Rotation.OnChange -= OnRotationChange;
         _myPlayer.WeaponPaths.OnAdd -= OnWeaponPathsAdded;
-        _myPlayer.OnChange -= OnActiveWeaponChange;
+        _myPlayer.OnChange -= OnDataChange;
     }
 
-    public void Shoot()
+    public void TakeDamage(int value, OwnerData ownerData)
     {
-        _playerWeaponView.Shoot();
+        
+    }
+
+    public void Shoot(OwnerData ownerData)
+    {
+        _playerWeaponView.Shoot(ownerData);
+    }
+
+    public void SetTeamindex(int index)
+    {
+        TeamIndex = index;
     }
 
     public void SetMovePosition(Vector3 targetPosition)
     {
         _enemyMovement.SetTargetPosition(targetPosition);
+    }
+
+    private void OnHealthChanged()
+    {
+        _progressBar.SetValue(_healthPresenter.HealthNormalized);
     }
 
     private void OnPositionChange(List<DataChange> changes)
@@ -120,7 +143,7 @@ public class EnemyView : MonoBehaviour
         _playerWeaponView.AddWeapon(new WeaponFactory().Create(value), haveSwith);
     }
 
-    private void OnActiveWeaponChange(List<DataChange> changes)
+    private void OnDataChange(List<DataChange> changes)
     {
         foreach (DataChange change in changes)
         {
@@ -128,6 +151,14 @@ public class EnemyView : MonoBehaviour
             {
                 case "ActiveWeapon":
                     _playerWeaponView.SwitchWeapon(change.Value.ConvertTo<int>());
+                    break;
+
+                case "TeamIndex":
+                    SetTeamindex(change.Value.ConvertTo<int>());
+                    break;
+
+                case "Health":
+                    _healthPresenter.SetHealth(change.Value.ConvertTo<int>());
                     break;
             }
         }

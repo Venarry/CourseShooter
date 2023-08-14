@@ -10,6 +10,11 @@ public class PlayerRotation : MonoBehaviour
 
     public event Action<Vector3> RotationXChanged;
 
+    public void SetBehaviourState(bool state)
+    {
+        _camera.gameObject.SetActive(state);
+    }
+
     public void Rotate()
     {
         //_camera.transform.localRotation = Quaternion.Euler(_currentRotation.x, 0, 0);

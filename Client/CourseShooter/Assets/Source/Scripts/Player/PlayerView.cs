@@ -5,31 +5,45 @@ using UnityEngine;
 [RequireComponent(typeof(PlayerMovement))]
 [RequireComponent(typeof(PlayerRotation))]
 [RequireComponent(typeof(PlayerWeaponView))]
-public class PlayerView : MonoBehaviour
+[RequireComponent(typeof(ProgressBar))]
+public class PlayerView : MonoBehaviour, IDamageable
 {
     private PlayerMovement _playerMovement;
     private PlayerRotation _playerCameraRotation;
     private PlayerWeaponView _playerWeaponView;
-    private MultiplayerHandler _multiplayerHandler;
+    private HealthPresenter _healthPresenter;
+    private ProgressBar _progressBar;
     private IInputsHandler _inputsHandler;
     private bool _isInitialized;
+
+    public event Action<MovementData> MovementDataChanged;
+    public event Action<Vector3> RotationChanged;
+    public event Action<string> WeaponAdded;
+    public event Action<int> WeaponSwitched;
+    public event Action<int> HealthChanged;
+    public event Action<int> TeamIndexChanged;
+    public event Action<OwnerData> Killed;
+    public event Action Shooted;
+
+    public int TeamIndex { get; private set; }
 
     private void Awake()
     {
         _playerMovement = GetComponent<PlayerMovement>();
         _playerCameraRotation = GetComponent<PlayerRotation>();
         _playerWeaponView = GetComponent<PlayerWeaponView>();
+        _progressBar = GetComponent<ProgressBar>();
         MapSettings.HideCursor();
     }
 
-    public void Init(MultiplayerHandler multiplayerHandler, PlayerWeaponPresenter playerWeaponPresenter, IInputsHandler inputsHandler)
+    public void Init(HealthPresenter healthPresenter, IInputsHandler inputsHandler, int teamNumber)
     {
         gameObject.SetActive(false);
 
-        _multiplayerHandler = multiplayerHandler; // не нужно
         _inputsHandler = inputsHandler;
+        _healthPresenter = healthPresenter;
+        _progressBar.SetValue(_healthPresenter.HealthNormalized);
         _isInitialized = true;
-        _playerWeaponView.Init(playerWeaponPresenter);
 
         gameObject.SetActive(true);
     }
@@ -39,11 +53,14 @@ public class PlayerView : MonoBehaviour
         if (_isInitialized == false)
             return;
 
+        _healthPresenter.Enable();
         _playerMovement.PositionChanged += OnMovementDataChanged;
         _playerCameraRotation.RotationXChanged += OnRotationXChanged;
         _playerWeaponView.WeaponAdded += OnWeaponAdded;
         _playerWeaponView.WeaponSwitched += OnWeaponSwitched;
         _playerWeaponView.Shooted += OnShoot;
+        _healthPresenter.HealthChanged += OnHealthChanged;
+        _healthPresenter.HealthOver += OnHealthOver;
     }
 
     private void OnDisable()
@@ -51,11 +68,13 @@ public class PlayerView : MonoBehaviour
         if (_isInitialized == false)
             return;
 
+        _healthPresenter.Disable();
         _playerMovement.PositionChanged -= OnMovementDataChanged;
         _playerCameraRotation.RotationXChanged -= OnRotationXChanged;
         _playerWeaponView.WeaponAdded -= OnWeaponAdded;
         _playerWeaponView.WeaponSwitched -= OnWeaponSwitched;
         _playerWeaponView.Shooted -= OnShoot;
+        _healthPresenter.HealthChanged -= OnHealthChanged;
     }
 
     private void Update()
@@ -84,6 +103,34 @@ public class PlayerView : MonoBehaviour
         ProcessRotation();
     }
 
+    public void SetBehaviourState(bool state)
+    {
+        _playerMovement.SetBehaviourState(state);
+        _playerCameraRotation.SetBehaviourState(state);
+
+        if(state == false)
+            PauseHandler.AddPauseLevel();
+        else
+            PauseHandler.RemovePauseLevel();
+    }
+
+    public void SetTeamIndex(int index)
+    {
+        TeamIndex = index;
+        TeamIndexChanged?.Invoke(TeamIndex);
+    }
+
+    public void Respawn(Vector3 respawnPosition)
+    {
+        _healthPresenter.Restore();
+        _playerMovement.SetPosition(respawnPosition);
+    }
+
+    public void TakeDamage(int value, OwnerData ownerData)
+    {
+        _healthPresenter.TakeDamage(value, ownerData);
+    }
+
     public void AddWeapon(WeaponView weaponView)
     {
         _playerWeaponView.AddWeapon(weaponView, haveSwitch: true);
@@ -99,6 +146,7 @@ public class PlayerView : MonoBehaviour
     {
         _playerMovement.Move();
     }
+
     private void ProcessRotation()
     {
         _playerCameraRotation.Rotate();
@@ -108,7 +156,8 @@ public class PlayerView : MonoBehaviour
     {
         if (_inputsHandler.IsPressedShoot == true)
         {
-            _playerWeaponView.Shoot();
+            OwnerData ownerData = new(TeamIndex);
+            _playerWeaponView.Shoot(ownerData);
             return;
         }
 
@@ -121,26 +170,37 @@ public class PlayerView : MonoBehaviour
     private void OnMovementDataChanged(Vector3 position)
     {
         MovementData movementData = new(position, _playerMovement.MoveDirection);
-        MultiplayerHandler.Instance.SendPlayerData("Move", movementData);
+        MovementDataChanged?.Invoke(movementData);
     }
 
     private void OnRotationXChanged(Vector3 rotation)
     {
-        _multiplayerHandler.SendPlayerData("Rotate", rotation);
+        RotationChanged?.Invoke(rotation);
     }
 
     private void OnWeaponAdded(string prefabPath)
     {
-        _multiplayerHandler.SendPlayerData("AddWeapon", prefabPath);
+        WeaponAdded?.Invoke(prefabPath);
     }
 
     private void OnWeaponSwitched(int weaponIndex)
     {
-        _multiplayerHandler.SendPlayerData("SwitchWeapon", weaponIndex);
+        WeaponSwitched?.Invoke(weaponIndex);
     }
 
     private void OnShoot()
     {
-        _multiplayerHandler.SendPlayerData("OnShoot", _multiplayerHandler.ClientId);
+        Shooted?.Invoke();
+    }
+
+    private void OnHealthOver(OwnerData ownerData)
+    {
+        Killed?.Invoke(ownerData);
+    }
+
+    private void OnHealthChanged()
+    {
+        _progressBar.SetValue(_healthPresenter.HealthNormalized);
+        HealthChanged?.Invoke(_healthPresenter.Health);
     }
 }

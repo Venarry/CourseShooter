@@ -1,13 +1,15 @@
 using System;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ChatView : MonoBehaviour
 {
     [SerializeField] private GameObject _chat;
     [SerializeField] private TMP_InputField _inputField;
     [SerializeField] private Transform _messagePoint;
-    [SerializeField] private TMP_Text _messagePrefab;
+    [SerializeField] private ChatMessage _messagePrefab;
 
     private ChatPresenter _chatPresenter;
 
@@ -23,6 +25,11 @@ public class ChatView : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.T))
         {
             Show();
+        }
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            //OnChatDeselect("");
         }
     }
 
@@ -42,11 +49,12 @@ public class ChatView : MonoBehaviour
 
     public void ShowMessage(string message)
     {
-        TMP_Text spawnedMessage = Instantiate(_messagePrefab, Vector3.zero, Quaternion.identity);
+        ChatMessage spawnedMessage = Instantiate(_messagePrefab, Vector3.zero, Quaternion.identity);
+        spawnedMessage.SetText(message);
         spawnedMessage.transform.SetParent(_messagePoint);
-        spawnedMessage.transform.SetAsFirstSibling();
         spawnedMessage.transform.localScale = Vector3.one;
-        spawnedMessage.text = message;
+        //spawnedMessage.transform.SetAsFirstSibling();
+        //spawnedMessage.transform.SetAsLastSibling();
     }
 
     public void OnMessageSubmit(string message)
@@ -61,14 +69,12 @@ public class ChatView : MonoBehaviour
 
     public void OnChatSelect(string message)
     {
-        Debug.Log("select");
         PauseHandler.AddPauseLevel();
         MapSettings.ShowCursor();
     }
 
     public void OnChatDeselect(string message)
     {
-        Debug.Log("deselect");
         PauseHandler.RemovePauseLevel();
         MapSettings.HideCursor();
         Hide();

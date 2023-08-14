@@ -12,7 +12,7 @@ public partial class Player : Schema {
 	public string Name = default(string);
 
 	[Type(1, "number")]
-	public float SpawnPointIndex = default(float);
+	public float Health = default(float);
 
 	[Type(2, "ref", typeof(MyVector3))]
 	public MyVector3 Position = new MyVector3();
@@ -28,5 +28,8 @@ public partial class Player : Schema {
 
 	[Type(6, "number")]
 	public float ActiveWeapon = default(float);
+
+	[Type(7, "number")]
+	public float TeamIndex = default(float);
 }
 
