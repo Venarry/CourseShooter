@@ -5,7 +5,7 @@ public class HealthPresenter
     private readonly HealthModel _healthModel;
 
     public event Action HealthChanged;
-    public event Action<OwnerData> HealthOver;
+    public event Action<ShootData> HealthOver;
 
     public HealthPresenter(HealthModel healthModel)
     {
@@ -48,7 +48,7 @@ public class HealthPresenter
         _healthModel.SetMaxHealth(value);
     }
 
-    public void TakeDamage(int value, OwnerData ownerData)
+    public void TakeDamage(int value, ShootData ownerData)
     {
         _healthModel.TakeDamage(value, ownerData);
     }
@@ -58,7 +58,7 @@ public class HealthPresenter
         HealthChanged?.Invoke();
     }
 
-    private void OnKilled(OwnerData ownerData)
+    private void OnKilled(ShootData ownerData)
     {
         HealthOver?.Invoke(ownerData);
     }

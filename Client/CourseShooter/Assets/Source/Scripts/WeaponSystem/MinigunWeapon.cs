@@ -10,7 +10,7 @@ public class MinigunWeapon : WeaponView
         _bulletsFactory = new();
     }
 
-    public override bool TryShoot(OwnerData ownerData)
+    public override bool TryShoot(ShootData ownerData)
     {
         if (IsReadyToShoot == false)
             return false;

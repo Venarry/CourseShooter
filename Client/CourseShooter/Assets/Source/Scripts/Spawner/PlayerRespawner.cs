@@ -9,6 +9,9 @@ public class PlayerRespawner
         _spawnPointsData = spawnPointsData;
     }
 
+    public Vector3 GetRandomPosition(int teamIndex) =>
+        _spawnPointsData.GetRandomSpawnPosition(teamIndex);
+
     public Vector3 Respawn(PlayerView player)
     {
         Vector3 respawnPosition = _spawnPointsData.GetRandomSpawnPosition(player.TeamIndex);

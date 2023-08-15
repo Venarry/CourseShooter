@@ -32,7 +32,7 @@ public class MultiplayerPlayerDieHandler : MonoBehaviour
         _playerView.Killed -= OnKilled;
     }
 
-    private void OnKilled(OwnerData ownerData)
+    private void OnKilled(ShootData ownerData)
     {
         StartCoroutine(Respawn());
     }

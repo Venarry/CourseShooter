@@ -1,4 +1,4 @@
 public interface IDamageable
 {
-    public void TakeDamage(int value, OwnerData ownerData);
+    public void TakeDamage(int value, ShootData ownerData);
 }

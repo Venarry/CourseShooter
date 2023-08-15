@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 [RequireComponent(typeof(CharacterController))]
 public class PlayerMovement : MonoBehaviour
@@ -17,6 +18,7 @@ public class PlayerMovement : MonoBehaviour
     private bool _isStayOnGound;
 
     public event Action<Vector3> PositionChanged;
+    public event Action<Vector3> DirectionChanged;
 
     public Vector3 MoveDirection => _moveDirection;
 
@@ -42,14 +44,21 @@ public class PlayerMovement : MonoBehaviour
     public void Move()
     {
         Vector3 previousVelocity = _characterController.velocity;
+        Vector3 previousPosition = transform.position;
         _characterController.Move(_moveDirection);
         ReduceGravityForce();
 
         Vector3 currentVelocity = _characterController.velocity;
+        Vector3 currentPosition = transform.position;
 
-        if (previousVelocity != currentVelocity)
+        if (previousPosition != currentPosition)
         {
-            PositionChanged?.Invoke(transform.position);
+            PositionChanged?.Invoke(currentPosition);
+        }
+
+        if(previousVelocity != currentVelocity)
+        {
+            DirectionChanged?.Invoke(MoveDirection);
         }
     }
 

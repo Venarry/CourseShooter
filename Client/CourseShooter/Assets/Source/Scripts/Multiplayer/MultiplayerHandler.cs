@@ -74,7 +74,7 @@ public class MultiplayerHandler : ColyseusManager<MultiplayerHandler>
         if (_spawnedEnemys.ContainsKey(ownerId) == false)
             return;
 
-        OwnerData ownerData = new(_spawnedEnemys[ownerId].TeamIndex);
+        ShootData ownerData = new(_spawnedEnemys[ownerId].TeamIndex);
         _spawnedEnemys[ownerId].Shoot(ownerData);
     }
 

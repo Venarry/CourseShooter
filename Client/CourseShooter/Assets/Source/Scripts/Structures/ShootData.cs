@@ -1,6 +1,6 @@
-public struct OwnerData
+public struct ShootData
 {
-    public OwnerData(int ownerTeamIndex)
+    public ShootData(int ownerTeamIndex)
     {
         TeamIndex = ownerTeamIndex;
     }

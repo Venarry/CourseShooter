@@ -28,7 +28,7 @@ public class PlayerFactory
     {
         PlayerRespawner playerRespawner = new(_spawnPointsDataSource);
 
-        PlayerView player = Object.Instantiate(_prefab, position, Quaternion.identity);
+        PlayerView player = Object.Instantiate(_prefab, Vector3.zero, Quaternion.identity);
 
         PlayerWeaponModel playerWeaponModel = new();
         PlayerWeaponPresenter playerWeaponPresenter = new(playerWeaponModel);
@@ -49,6 +49,7 @@ public class PlayerFactory
 
         player.Init(healthPresenter, inputsHandler, teamIndex);
         player.SetTeamIndex(teamIndex);
+        player.SetPosition(position);
 
         WeaponView minigun = _weaponFactory.Create(ResourcesPath.Minigun);
         player.AddWeapon(minigun);

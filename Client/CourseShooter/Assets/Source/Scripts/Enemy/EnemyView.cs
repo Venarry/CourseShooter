@@ -1,5 +1,6 @@
 using Colyseus.Schema;
 using System.Collections.Generic;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -78,12 +79,12 @@ public class EnemyView : MonoBehaviour, IDamageable
         _myPlayer.OnChange -= OnDataChange;
     }
 
-    public void TakeDamage(int value, OwnerData ownerData)
+    public void TakeDamage(int value, ShootData ownerData)
     {
         
     }
 
-    public void Shoot(OwnerData ownerData)
+    public void Shoot(ShootData ownerData)
     {
         _playerWeaponView.Shoot(ownerData);
     }
@@ -105,9 +106,8 @@ public class EnemyView : MonoBehaviour, IDamageable
 
     private void OnPositionChange(List<DataChange> changes)
     {
-        Vector3 targetPosition = transform.position;
+        Vector3 targetPosition = _enemyMovement.TargetPosition;
         targetPosition = ApplyVectorChanges(changes, targetPosition);
-
         _enemyMovement.SetTargetPosition(targetPosition);
     }
 

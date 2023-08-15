@@ -12,6 +12,8 @@ public class EnemyMovement : MonoBehaviour
     public event Action<bool> GroundedStateChanged;
     public event Action<Vector3> MoveDirectionChanged;
 
+    public Vector3 TargetPosition => _targetPosition;
+
     private void Awake()
     {
         _characterController = GetComponent<CharacterController>();
@@ -33,6 +35,15 @@ public class EnemyMovement : MonoBehaviour
     public void SetTargetPosition(Vector3 targetPosition)
     {
         _targetPosition = targetPosition;
+
+        float teleportDistance = 2f;
+
+        if (Vector3.Distance(transform.position, _targetPosition) > teleportDistance)
+        {
+            _characterController.enabled = false;
+            transform.position = _targetPosition;
+            _characterController.enabled = true;
+        }
     }
 
     public void SetPosition(Vector3 position)
@@ -43,19 +54,6 @@ public class EnemyMovement : MonoBehaviour
     public void SetMoveDirection(Vector3 moveDirection)
     {
         _moveDirection = moveDirection;
-    }
-
-    private void InterpolateWithSmallPredicate()
-    {
-        float interpolationMultiplier = 0.25f;
-        transform.position = Vector3.Lerp(transform.position, _targetPosition + _moveDirection, interpolationMultiplier);
-    }
-
-    private void InterpolateWithPredicate()
-    {
-        float interpolationMultiplier = 0.25f;
-        _targetPosition += _moveDirection;
-        transform.position = Vector3.Lerp(transform.position, _targetPosition, interpolationMultiplier); 
     }
 
     private void InterpolateWithPredicateCharacterController()

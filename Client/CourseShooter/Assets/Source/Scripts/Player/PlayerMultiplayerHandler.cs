@@ -31,7 +31,8 @@ public class PlayerMultiplayerHandler : MonoBehaviour
         if (_isInitialized == false)
             return;
 
-        _playerView.MovementDataChanged += OnMovementDataChanged;
+        _playerView.PositionChanged += OnPositionChanged;
+        _playerView.DirectionChanged += OnDirectionChanged;
         _playerView.RotationChanged += OnRotationChanged;
         _playerView.WeaponAdded += OnWeaponAdded;
         _playerView.WeaponSwitched += OnWeaponSwitched;
@@ -41,22 +42,13 @@ public class PlayerMultiplayerHandler : MonoBehaviour
         _playerView.Killed += OnKilled;
     }
 
-    private void OnTeamIndexChanged(int index)
-    {
-        _multiplayerHandler.SendPlayerData("OnTeamIndexChanged", index);
-    }
-
-    private void OnKilled(OwnerData ownerData)
-    {
-        _multiplayerHandler.SendPlayerData("OnKilled", ownerData);
-    }
-
     private void OnDisable()
     {
         if (_isInitialized == false)
             return;
 
-        _playerView.MovementDataChanged -= OnMovementDataChanged;
+        _playerView.PositionChanged -= OnPositionChanged;
+        _playerView.DirectionChanged -= OnDirectionChanged;
         _playerView.RotationChanged -= OnRotationChanged;
         _playerView.WeaponAdded -= OnWeaponAdded;
         _playerView.WeaponSwitched -= OnWeaponSwitched;
@@ -64,6 +56,16 @@ public class PlayerMultiplayerHandler : MonoBehaviour
         _playerView.HealthChanged -= OnHealthChanged;
         _playerView.TeamIndexChanged -= OnTeamIndexChanged;
         _playerView.Killed -= OnKilled;
+    }
+
+    private void OnTeamIndexChanged(int index)
+    {
+        _multiplayerHandler.SendPlayerData("OnTeamIndexChanged", index);
+    }
+
+    private void OnKilled(ShootData shootData)
+    {
+        _multiplayerHandler.SendPlayerData("OnKilled", shootData);
     }
 
     private void OnShooted()
@@ -86,9 +88,14 @@ public class PlayerMultiplayerHandler : MonoBehaviour
         _multiplayerHandler.SendPlayerData("Rotate", rotation);
     }
 
-    private void OnMovementDataChanged(MovementData movementData)
+    private void OnPositionChanged(Vector3 position)
     {
-        _multiplayerHandler.SendPlayerData("Move", movementData);
+        _multiplayerHandler.SendPlayerData("SetPosition", position);
+    }
+
+    private void OnDirectionChanged(Vector3 direction)
+    {
+        _multiplayerHandler.SendPlayerData("SetDirection", direction);
     }
 
     private void OnHealthChanged(int value)

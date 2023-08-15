@@ -28,7 +28,7 @@ public class SphereBullet : Bullet
     {
         if(other.TryGetComponent(out IDamageable damageable))
         {
-            OwnerData ownerData = new();
+            ShootData ownerData = new();
             damageable.TakeDamage(Damage, ownerData);
             Destroy(gameObject);
         }

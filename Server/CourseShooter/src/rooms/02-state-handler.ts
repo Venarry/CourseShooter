@@ -164,7 +164,6 @@ export class State extends Schema {
     {
         const player = new Player(sessionId);
         this.players.set(sessionId, player);
-        player.SetMovePosition(data.Position);
     }
 
     SetSpawnState(sessionId: string, state: boolean)
@@ -184,6 +183,11 @@ export class State extends Schema {
     SetPlayerPosition (sessionId: string, position: MyVector3) 
     {
         this.players.get(sessionId).SetMovePosition(position);
+    }
+
+    SetPlayerDirection (sessionId: string, direction: MyVector3) 
+    {
+        this.players.get(sessionId).SetMoveDirection(direction);
     }
 
     RotatePlayer(sessionId: string, targetRotation: any)
@@ -229,9 +233,14 @@ export class StateHandlerRoom extends Room<State> {
             this.broadcast("SpawnPlayer", client.sessionId, { except: client });
         });
 
-        this.onMessage("Move", (client, data) => 
+        this.onMessage("SetPosition", (client, position) => 
         {
-            this.state.movePlayer(client.sessionId, data);
+            this.state.SetPlayerPosition(client.sessionId, position);
+        });
+
+        this.onMessage("SetDirection", (client, direction) => 
+        {
+            this.state.SetPlayerDirection(client.sessionId, direction);
         });
 
         this.onMessage("Rotate", (client, data) => 

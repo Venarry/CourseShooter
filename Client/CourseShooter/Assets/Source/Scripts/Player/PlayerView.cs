@@ -16,13 +16,14 @@ public class PlayerView : MonoBehaviour, IDamageable
     private IInputsHandler _inputsHandler;
     private bool _isInitialized;
 
-    public event Action<MovementData> MovementDataChanged;
+    public event Action<Vector3> PositionChanged;
+    public event Action<Vector3> DirectionChanged;
     public event Action<Vector3> RotationChanged;
     public event Action<string> WeaponAdded;
     public event Action<int> WeaponSwitched;
     public event Action<int> HealthChanged;
     public event Action<int> TeamIndexChanged;
-    public event Action<OwnerData> Killed;
+    public event Action<ShootData> Killed;
     public event Action Shooted;
 
     public int TeamIndex { get; private set; }
@@ -54,7 +55,8 @@ public class PlayerView : MonoBehaviour, IDamageable
             return;
 
         _healthPresenter.Enable();
-        _playerMovement.PositionChanged += OnMovementDataChanged;
+        _playerMovement.PositionChanged += OnPositionChanged;
+        _playerMovement.DirectionChanged += OnDirectionChanged;
         _playerCameraRotation.RotationXChanged += OnRotationXChanged;
         _playerWeaponView.WeaponAdded += OnWeaponAdded;
         _playerWeaponView.WeaponSwitched += OnWeaponSwitched;
@@ -69,7 +71,7 @@ public class PlayerView : MonoBehaviour, IDamageable
             return;
 
         _healthPresenter.Disable();
-        _playerMovement.PositionChanged -= OnMovementDataChanged;
+        _playerMovement.PositionChanged -= OnPositionChanged;
         _playerCameraRotation.RotationXChanged -= OnRotationXChanged;
         _playerWeaponView.WeaponAdded -= OnWeaponAdded;
         _playerWeaponView.WeaponSwitched -= OnWeaponSwitched;
@@ -120,13 +122,18 @@ public class PlayerView : MonoBehaviour, IDamageable
         TeamIndexChanged?.Invoke(TeamIndex);
     }
 
+    public void SetPosition(Vector3 respawnPosition)
+    {
+        _playerMovement.SetPosition(respawnPosition);
+    }
+
     public void Respawn(Vector3 respawnPosition)
     {
         _healthPresenter.Restore();
         _playerMovement.SetPosition(respawnPosition);
     }
 
-    public void TakeDamage(int value, OwnerData ownerData)
+    public void TakeDamage(int value, ShootData ownerData)
     {
         if (ownerData.TeamIndex == TeamIndex)
             return;
@@ -159,7 +166,7 @@ public class PlayerView : MonoBehaviour, IDamageable
     {
         if (_inputsHandler.IsPressedShoot == true)
         {
-            OwnerData ownerData = new(TeamIndex);
+            ShootData ownerData = new(TeamIndex);
             _playerWeaponView.Shoot(ownerData);
             return;
         }
@@ -170,10 +177,15 @@ public class PlayerView : MonoBehaviour, IDamageable
         }
     }
 
-    private void OnMovementDataChanged(Vector3 position)
+    private void OnPositionChanged(Vector3 position)
     {
-        MovementData movementData = new(position, _playerMovement.MoveDirection);
-        MovementDataChanged?.Invoke(movementData);
+        //MovementData movementData = new(position, _playerMovement.MoveDirection);
+        PositionChanged?.Invoke(position);
+    }
+
+    private void OnDirectionChanged(Vector3 direction)
+    {
+        DirectionChanged?.Invoke(direction);
     }
 
     private void OnRotationXChanged(Vector3 rotation)
@@ -196,7 +208,7 @@ public class PlayerView : MonoBehaviour, IDamageable
         Shooted?.Invoke();
     }
 
-    private void OnHealthOver(OwnerData ownerData)
+    private void OnHealthOver(ShootData ownerData)
     {
         Killed?.Invoke(ownerData);
     }
