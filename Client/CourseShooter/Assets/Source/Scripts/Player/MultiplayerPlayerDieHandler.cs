@@ -7,7 +7,7 @@ public class MultiplayerPlayerDieHandler : MonoBehaviour
 
     private Camera _followCamera;
     private PlayerView _playerView;
-    private SpawnPointsDataSource _spawnPointsDataSource;
+    private PlayerRespawner _playerRespawner;
     private WaitForSeconds _waitForSeconds = new(RespawnTime);
 
     private void Awake()
@@ -16,10 +16,10 @@ public class MultiplayerPlayerDieHandler : MonoBehaviour
         _waitForSeconds = new(RespawnTime);
     }
 
-    public void Init(Camera followCamera, SpawnPointsDataSource spawnPointsDataSource)
+    public void Init(Camera followCamera, PlayerRespawner playerRespawner)
     {
         _followCamera = followCamera;
-        _spawnPointsDataSource = spawnPointsDataSource;
+        _playerRespawner = playerRespawner;
     }
 
     private void OnEnable()
@@ -44,10 +44,8 @@ public class MultiplayerPlayerDieHandler : MonoBehaviour
 
         yield return _waitForSeconds;
 
-        Vector3 respawnPosition = _spawnPointsDataSource.GetRandomSpawnPosition(_playerView.TeamIndex);
-
         _playerView.SetBehaviourState(true);
         _followCamera.gameObject.SetActive(false);
-        _playerView.Respawn(respawnPosition);
+        _playerRespawner.Respawn(_playerView);
     }
 }

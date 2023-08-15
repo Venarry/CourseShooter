@@ -12,7 +12,7 @@ export class MyVector3 extends Schema
     @type("number")
     z = 0;
 
-    constructor (x = 0, y = 0, z = 0)
+    constructor (x: number, y: number, z: number)
     {
         super();
 
@@ -21,7 +21,7 @@ export class MyVector3 extends Schema
         this.z = z;
     }
 
-    SetValues(newValues: any)
+    SetValues(newValues: MyVector3)
     {
         this.x = newValues.x;
         this.y = newValues.y;
@@ -44,6 +44,12 @@ export class MapScoreData extends Schema
         this.Score = startScore;
     }
 
+    SetData(teamIndex: number, startScore: number)
+    {
+        this.TeamIndex = teamIndex;
+        this.Score = startScore;
+    }
+
     AddScore()
     {
         this.Score++;
@@ -52,7 +58,7 @@ export class MapScoreData extends Schema
 
 export class Player extends Schema 
 {
-    constructor(sessionId = "") 
+    constructor(sessionId: string) 
     {
         super();
 
@@ -66,13 +72,13 @@ export class Player extends Schema
     Health;
 
     @type(MyVector3)
-    Position = new MyVector3();
+    Position = new MyVector3(0, 0, 0);
 
     @type(MyVector3)
-    Direction = new MyVector3();
+    Direction = new MyVector3(0, 0, 0);
 
     @type(MyVector3)
-    Rotation = new MyVector3();
+    Rotation = new MyVector3(0, 0, 0);
 
     @type([ "string" ]) 
     WeaponPaths = new ArraySchema<string>();
@@ -82,6 +88,14 @@ export class Player extends Schema
 
     @type("number")
     TeamIndex: number;
+
+    @type("boolean")
+    IsSpawned = false;
+
+    SetSpawnState(state: boolean)
+    {
+        this.IsSpawned = state;
+    }
 
     SetMoveData(newMovemetData: any)
     {
@@ -132,59 +146,44 @@ export class State extends Schema {
     @type({ map: MapScoreData })
     Score = new MapSchema<MapScoreData>();
     
-    AddScore(data: any)
+    AddScore(teamIndex: number)
     {
-        if(this.Score.has(data.TeamIndex))
+        if(this.Score.has(teamIndex.toString()))
         {
-            this.Score.get(data.TeamIndex).AddScore();
+            this.Score.get(teamIndex.toString()).AddScore();
         }
         else
         {
             var startScore = 1;
-            this.Score.set(data.TeamIndex, new MapScoreData(data.TeamIndex, startScore));
+            var scoreData = new MapScoreData(teamIndex, startScore);
+            this.Score.set(teamIndex.toString(), scoreData);
         }
-
-        console.log("set index: " + data.TeamIndex + " with score " + this.Score.get(data.TeamIndex).Score);
-
-        //console.log(this.Score);
     }
-
-    /*@type([ "number" ])
-    Score = new ArraySchema<"number">();
-
-    AddScore(data: any)
-    {
-        //console.log(data.TeamIndex);
-
-        if(this.Score.length - 1 >= data.TeamIndex)
-        {
-            var currentScore: "number" = this.Score[data.TeamIndex];
-            var newScore: "number" = currentScore + 1 as "number";
-            this.Score[data.TeamIndex] = newScore;
-        }
-        else
-        {
-            var startScore: "number" = 1 as unknown as "number";
-            this.Score.set(data.TeamIndex, startScore);
-        }
-
-        console.log(this.Score);
-    }*/
 
     createPlayer(sessionId: string, data: any) 
     {
         const player = new Player(sessionId);
-        player.SetMovePosition(data.Position);
         this.players.set(sessionId, player);
+        player.SetMovePosition(data.Position);
+    }
+
+    SetSpawnState(sessionId: string, state: boolean)
+    {
+        this.players.get(sessionId).SetSpawnState(state);
     }
 
     removePlayer(sessionId: string) {
         this.players.delete(sessionId);
     }
 
-    movePlayer (sessionId: string, movement: any) 
+    movePlayer (sessionId: string, movementData: any) 
     {
-        this.players.get(sessionId).SetMoveData(movement);
+        this.players.get(sessionId).SetMoveData(movementData);
+    }
+
+    SetPlayerPosition (sessionId: string, position: MyVector3) 
+    {
+        this.players.get(sessionId).SetMovePosition(position);
     }
 
     RotatePlayer(sessionId: string, targetRotation: any)
@@ -222,6 +221,14 @@ export class StateHandlerRoom extends Room<State> {
 
         this.setState(new State());
 
+        this.onMessage("OnPlayerSpawn", (client, position) => 
+        {
+            var spawnPosition = new MyVector3(position.x, position.y, position.z);
+            this.state.SetPlayerPosition(client.sessionId, spawnPosition);
+            this.state.SetSpawnState(client.sessionId, true);
+            this.broadcast("SpawnPlayer", client.sessionId, { except: client });
+        });
+
         this.onMessage("Move", (client, data) => 
         {
             this.state.movePlayer(client.sessionId, data);
@@ -254,7 +261,6 @@ export class StateHandlerRoom extends Room<State> {
 
         this.onMessage("OnTeamIndexChanged", (client, data) => 
         {
-            console.log("team " + data);
             this.state.SetTeam(client.sessionId, data);
         });
 
@@ -265,7 +271,7 @@ export class StateHandlerRoom extends Room<State> {
 
         this.onMessage("OnKilled", (client, data) => 
         {
-            this.state.AddScore(data);
+            this.state.AddScore(data.TeamIndex);
         });
     }
 
@@ -276,7 +282,6 @@ export class StateHandlerRoom extends Room<State> {
     onJoin (client: Client, data: any) {
         client.send("hello", "world");
         this.state.createPlayer(client.sessionId, data);
-        console.log(data.TeamIndex);
     }
 
     onLeave (client) {

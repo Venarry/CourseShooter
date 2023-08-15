@@ -128,6 +128,9 @@ public class PlayerView : MonoBehaviour, IDamageable
 
     public void TakeDamage(int value, OwnerData ownerData)
     {
+        if (ownerData.TeamIndex == TeamIndex)
+            return;
+
         _healthPresenter.TakeDamage(value, ownerData);
     }
 

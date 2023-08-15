@@ -18,6 +18,14 @@ public class MapScoreView : MonoBehaviour
 
     public void OnScoreAdd(string key, MapScoreData value)
     {
+        if (int.TryParse(key, out int teamIndex) == false)
+            return;
+
+        _teamsScore[teamIndex].text = value.Score.ToString();
+
+        return;
+        Debug.Log("key " + key);
+        Debug.Log("value " + value.Score);
         value.OnChange += (changes) => 
         {
             foreach (var change in changes)

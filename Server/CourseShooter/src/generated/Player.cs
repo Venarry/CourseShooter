@@ -31,5 +31,8 @@ public partial class Player : Schema {
 
 	[Type(7, "number")]
 	public float TeamIndex = default(float);
+
+	[Type(8, "boolean")]
+	public bool IsSpawned = default(bool);
 }
 

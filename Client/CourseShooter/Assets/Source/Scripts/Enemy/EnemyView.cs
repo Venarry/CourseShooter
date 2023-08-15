@@ -160,6 +160,10 @@ public class EnemyView : MonoBehaviour, IDamageable
                 case "Health":
                     _healthPresenter.SetHealth(change.Value.ConvertTo<int>());
                     break;
+
+                case "IsSpawned":
+                    //_healthPresenter.SetHealth(change.Value.ConvertTo<int>());
+                    break;
             }
         }
     }
