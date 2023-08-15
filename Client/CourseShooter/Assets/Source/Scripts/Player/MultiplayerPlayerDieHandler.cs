@@ -6,6 +6,7 @@ public class MultiplayerPlayerDieHandler : MonoBehaviour
     private const float RespawnTime = 3;
 
     private Camera _followCamera;
+    private MainCameraHolder _cameraHolder;
     private PlayerView _playerView;
     private PlayerRespawner _playerRespawner;
     private WaitForSeconds _waitForSeconds = new(RespawnTime);
@@ -16,9 +17,10 @@ public class MultiplayerPlayerDieHandler : MonoBehaviour
         _waitForSeconds = new(RespawnTime);
     }
 
-    public void Init(Camera followCamera, PlayerRespawner playerRespawner)
+    public void Init(Camera followCamera, MainCameraHolder mainCameraHolder, PlayerRespawner playerRespawner)
     {
         _followCamera = followCamera;
+        _cameraHolder = mainCameraHolder;
         _playerRespawner = playerRespawner;
     }
 
@@ -32,7 +34,7 @@ public class MultiplayerPlayerDieHandler : MonoBehaviour
         _playerView.Killed -= OnKilled;
     }
 
-    private void OnKilled(ShootData ownerData)
+    private void OnKilled(ShooterData ownerData)
     {
         StartCoroutine(Respawn());
     }
@@ -40,7 +42,7 @@ public class MultiplayerPlayerDieHandler : MonoBehaviour
     private IEnumerator Respawn()
     {
         _playerView.SetBehaviourState(false);
-        _followCamera.gameObject.SetActive(true);
+        _cameraHolder.SetCamera(_followCamera);
 
         yield return _waitForSeconds;
 

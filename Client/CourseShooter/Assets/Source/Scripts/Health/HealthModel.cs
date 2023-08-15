@@ -4,7 +4,7 @@ public class HealthModel
 {
     public event Action HealthChanged;
     public event Action HealthOver;
-    public event Action<ShootData> Killed;
+    public event Action<ShooterData> Killed;
 
     public HealthModel(int maxValue)
     {
@@ -47,7 +47,7 @@ public class HealthModel
         MaxValue = value;
     }
 
-    public void TakeDamage(int value, ShootData ownerData)
+    public void TakeDamage(int value, ShooterData ownerData)
     {
         if(value < 0)
             value = 0;

@@ -10,12 +10,12 @@ public class PistolWeapon : WeaponView
         _bulletsFactory = new();
     }
 
-    public override bool TryShoot(ShootData ownerData)
+    public override bool TryShoot(ShooterData ownerData)
     {
         if (IsReadyToShoot == false)
             return false;
 
-        _bulletsFactory.CreatePistolBullet(_shootPoint, Damage);
+        _bulletsFactory.CreatePistolBullet(_shootPoint, Damage, ownerData);
         ResetShootTime();
         return true;
     }

@@ -2,18 +2,23 @@ using UnityEngine;
 
 public class LookAtRotator : MonoBehaviour
 {
-    private Camera _camera;
+    private Transform _target;
 
-    private void Start()
+    /*private void Start()
     {
-        _camera = Camera.main;
+        _target = Camera.main.transform;
+    }*/
+
+    public void SetTarget(Transform target)
+    {
+        _target = target;
     }
 
     private void LateUpdate()
     {
-        if (_camera == null)
+        if (_target == null)
             return;
 
-        transform.forward = _camera.transform.forward * -1;
+        transform.forward = _target.transform.forward * -1;
     }
 }

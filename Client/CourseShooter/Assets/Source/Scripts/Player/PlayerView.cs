@@ -23,7 +23,7 @@ public class PlayerView : MonoBehaviour, IDamageable
     public event Action<int> WeaponSwitched;
     public event Action<int> HealthChanged;
     public event Action<int> TeamIndexChanged;
-    public event Action<ShootData> Killed;
+    public event Action<ShooterData> Killed;
     public event Action Shooted;
 
     public int TeamIndex { get; private set; }
@@ -108,12 +108,16 @@ public class PlayerView : MonoBehaviour, IDamageable
     public void SetBehaviourState(bool state)
     {
         _playerMovement.SetBehaviourState(state);
-        _playerCameraRotation.SetBehaviourState(state);
 
         if(state == false)
+        {
             PauseHandler.AddPauseLevel();
+        }
         else
+        {
             PauseHandler.RemovePauseLevel();
+            _playerCameraRotation.ShowCamera();
+        }
     }
 
     public void SetTeamIndex(int index)
@@ -133,7 +137,7 @@ public class PlayerView : MonoBehaviour, IDamageable
         _playerMovement.SetPosition(respawnPosition);
     }
 
-    public void TakeDamage(int value, ShootData ownerData)
+    public void TakeDamage(int value, ShooterData ownerData)
     {
         if (ownerData.TeamIndex == TeamIndex)
             return;
@@ -166,7 +170,7 @@ public class PlayerView : MonoBehaviour, IDamageable
     {
         if (_inputsHandler.IsPressedShoot == true)
         {
-            ShootData ownerData = new(TeamIndex);
+            ShooterData ownerData = new(TeamIndex);
             _playerWeaponView.Shoot(ownerData);
             return;
         }
@@ -208,7 +212,7 @@ public class PlayerView : MonoBehaviour, IDamageable
         Shooted?.Invoke();
     }
 
-    private void OnHealthOver(ShootData ownerData)
+    private void OnHealthOver(ShooterData ownerData)
     {
         Killed?.Invoke(ownerData);
     }

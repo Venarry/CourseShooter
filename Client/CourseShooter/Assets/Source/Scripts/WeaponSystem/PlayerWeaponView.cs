@@ -43,7 +43,7 @@ public class PlayerWeaponView : MonoBehaviour
         _playerWeaponPresenter.WeaponSwitched -= OnWeaponSwitched;
     }
 
-    public void Shoot(ShootData ownerData)
+    public void Shoot(ShooterData ownerData)
     {
         if (_activeWeapon == null)
             return;

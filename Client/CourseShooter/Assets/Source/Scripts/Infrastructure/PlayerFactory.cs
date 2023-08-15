@@ -8,20 +8,21 @@ public class PlayerFactory
 
     private MultiplayerHandler _multiplayerHandler;
     private SpawnPointsDataSource _spawnPointsDataSource;
+    private MainCameraHolder _cameraHolder;
     private Camera _deathCamera;
 
     public void SetPlayerData(MultiplayerHandler multiplayerHandler, 
         SpawnPointsDataSource spawnPointsDataSource,
+        MainCameraHolder cameraHolder,
         Camera deathCamera)
     {
         _multiplayerHandler = multiplayerHandler;
         _spawnPointsDataSource = spawnPointsDataSource;
+        _cameraHolder = cameraHolder;
         _deathCamera = deathCamera;
     }
 
-    public PlayerView Create(/*MultiplayerHandler multiplayerHandler, 
-        SpawnPointsDataSource spawnPointsDataSource,
-        Camera followCamera, */
+    public PlayerView Create(
         Vector3 position, 
         int teamIndex, 
         bool isMultiplayer)
@@ -32,6 +33,8 @@ public class PlayerFactory
 
         PlayerWeaponModel playerWeaponModel = new();
         PlayerWeaponPresenter playerWeaponPresenter = new(playerWeaponModel);
+
+        player.GetComponent<PlayerRotation>().Init(_cameraHolder);
 
         IInputsHandler inputsHandler = new KeyboardInputsHandler();
         player.GetComponent<PlayerWeaponView>().Init(playerWeaponPresenter);
@@ -44,7 +47,7 @@ public class PlayerFactory
         if (isMultiplayer == true)
         {
             player.AddComponent<PlayerMultiplayerHandler>().Init(_multiplayerHandler);
-            player.AddComponent<MultiplayerPlayerDieHandler>().Init(_deathCamera, playerRespawner);
+            player.AddComponent<MultiplayerPlayerDieHandler>().Init(_deathCamera, _cameraHolder, playerRespawner);
         }
 
         player.Init(healthPresenter, inputsHandler, teamIndex);

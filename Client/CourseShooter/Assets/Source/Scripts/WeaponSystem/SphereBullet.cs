@@ -6,10 +6,11 @@ public class SphereBullet : Bullet
     private float _destroyTimer = 8f;
     private float _lifeTime;
 
-    public void Init(Transform shootPoint, int damage)
+    public void Init(Transform shootPoint, int damage, ShooterData shootData)
     {
         SetDamage(damage);
         SetShootPoint(shootPoint);
+        SetShootData(shootData);
     }
 
     private void FixedUpdate()
@@ -28,8 +29,7 @@ public class SphereBullet : Bullet
     {
         if(other.TryGetComponent(out IDamageable damageable))
         {
-            ShootData ownerData = new();
-            damageable.TakeDamage(Damage, ownerData);
+            damageable.TakeDamage(Damage, ShootData);
             Destroy(gameObject);
         }
     }

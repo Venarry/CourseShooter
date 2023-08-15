@@ -24,6 +24,11 @@ public class ProgressBar : MonoBehaviour
         _progress.fillAmount = progress;
     }
 
+    public void SetColor(Color color)
+    {
+        _progress.color = color;
+    }
+
     private void SetVisiable(bool state)
     {
         _progress.enabled = state;

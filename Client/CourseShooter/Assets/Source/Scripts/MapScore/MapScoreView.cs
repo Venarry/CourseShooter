@@ -16,8 +16,10 @@ public class MapScoreView : MonoBehaviour
         _presenter = new(new MapScoreModel(), this);
     }
 
-    public void OnScoreAdd(string key, MapScoreData value)
+    public void OnScoreTeamAdd(string key, MapScoreData value)
     {
+        /*value.OnChange += OnScoreChange;
+
         if (int.TryParse(key, out int teamIndex) == false)
             return;
 
@@ -25,7 +27,7 @@ public class MapScoreView : MonoBehaviour
 
         return;
         Debug.Log("key " + key);
-        Debug.Log("value " + value.Score);
+        Debug.Log("value " + value.Score);*/
         value.OnChange += (changes) => 
         {
             foreach (var change in changes)
@@ -45,4 +47,11 @@ public class MapScoreView : MonoBehaviour
         _teamsScore[teamindex].text = score.ToString();
     }
 
+    private void OnScoreChange(List<DataChange> changes)
+    {
+        foreach (var change in changes)
+        {
+
+        }
+    }
 }

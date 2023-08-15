@@ -3,6 +3,7 @@ using UnityEngine;
 public abstract class Bullet : MonoBehaviour
 {
     protected int Damage { get; private set; }
+    protected ShooterData ShootData { get; private set; }
 
     protected void SetShootPoint(Transform shootPoint)
     {
@@ -15,5 +16,10 @@ public abstract class Bullet : MonoBehaviour
             damage = 0;
 
         Damage = damage;
+    }
+
+    protected void SetShootData(ShooterData shootData)
+    {
+        ShootData = shootData;
     }
 }

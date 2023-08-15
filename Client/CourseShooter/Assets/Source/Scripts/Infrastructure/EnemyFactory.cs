@@ -3,6 +3,12 @@ using UnityEngine;
 public class EnemyFactory
 {
     private readonly EnemyView _prefab = Resources.Load<EnemyView>(ResourcesPath.EnemyPrefab);
+    private MainCameraHolder _cameraHolder;
+
+    public void SetEnemyData(MainCameraHolder mainCameraHolder)
+    {
+        _cameraHolder = mainCameraHolder;
+    }
 
     public EnemyView Create(Player thisPlayer)
     {
@@ -17,8 +23,9 @@ public class EnemyFactory
 
         HealthModel healthModel = new(maxValue: 100);
         HealthPresenter healthPresenter = new(healthModel);
+        enemy.GetComponent<EnemyHealthView>().Init(healthPresenter, _cameraHolder);
 
-        enemy.Init(healthPresenter, thisPlayer);
+        enemy.Init(thisPlayer);
 
         return enemy;
     }

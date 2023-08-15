@@ -9,14 +9,14 @@ using UnityEngine;
 [RequireComponent(typeof(EnemyRotation))]
 [RequireComponent(typeof(PlayerWeaponView))]
 [RequireComponent(typeof(ProgressBar))]
+[RequireComponent(typeof(EnemyHealthView))]
 public class EnemyView : MonoBehaviour, IDamageable
 {
     private EnemyMovement _enemyMovement;
     private EnemyAnimation _enemyAnimation;
     private EnemyRotation _enemyRotation;
     private PlayerWeaponView _playerWeaponView;
-    private HealthPresenter _healthPresenter;
-    private ProgressBar _progressBar;
+    private EnemyHealthView _enemyHealthView;
     private Player _myPlayer;
 
     private Vector3 _moveDirection = Vector3.zero;
@@ -30,16 +30,14 @@ public class EnemyView : MonoBehaviour, IDamageable
         _enemyAnimation = GetComponent<EnemyAnimation>();
         _enemyRotation = GetComponent<EnemyRotation>();
         _playerWeaponView = GetComponent<PlayerWeaponView>();
-        _progressBar = GetComponent<ProgressBar>();
+        _enemyHealthView = GetComponent<EnemyHealthView>();
     }
 
-    public void Init(HealthPresenter healthPresenter, Player myPlayer)
+    public void Init(Player myPlayer)
     {
         gameObject.SetActive(false);
 
         _myPlayer = myPlayer;
-        _healthPresenter = healthPresenter;
-        _progressBar.SetValue(_healthPresenter.HealthNormalized);
         _isInitialized = true;
 
         gameObject.SetActive(true);
@@ -50,10 +48,8 @@ public class EnemyView : MonoBehaviour, IDamageable
         if (_isInitialized == false)
             return;
 
-        _healthPresenter.Enable();
         _enemyMovement.GroundedStateChanged += OnGroundedChanged;
         _enemyMovement.MoveDirectionChanged += OnVelocityChanged;
-        _healthPresenter.HealthChanged += OnHealthChanged;
 
         _myPlayer.Position.OnChange += OnPositionChange;
         _myPlayer.Direction.OnChange += OnDirectionChange;
@@ -67,10 +63,8 @@ public class EnemyView : MonoBehaviour, IDamageable
         if (_isInitialized == false)
             return;
 
-        _healthPresenter.Disable();
         _enemyMovement.GroundedStateChanged -= OnGroundedChanged;
         _enemyMovement.MoveDirectionChanged -= OnVelocityChanged;
-        _healthPresenter.HealthChanged -= OnHealthChanged;
 
         _myPlayer.Position.OnChange -= OnPositionChange;
         _myPlayer.Direction.OnChange -= OnDirectionChange;
@@ -79,12 +73,9 @@ public class EnemyView : MonoBehaviour, IDamageable
         _myPlayer.OnChange -= OnDataChange;
     }
 
-    public void TakeDamage(int value, ShootData ownerData)
-    {
-        
-    }
+    public void TakeDamage(int value, ShooterData ownerData) { }
 
-    public void Shoot(ShootData ownerData)
+    public void Shoot(ShooterData ownerData)
     {
         _playerWeaponView.Shoot(ownerData);
     }
@@ -97,11 +88,6 @@ public class EnemyView : MonoBehaviour, IDamageable
     public void SetMovePosition(Vector3 targetPosition)
     {
         _enemyMovement.SetTargetPosition(targetPosition);
-    }
-
-    private void OnHealthChanged()
-    {
-        _progressBar.SetValue(_healthPresenter.HealthNormalized);
     }
 
     private void OnPositionChange(List<DataChange> changes)
@@ -158,11 +144,8 @@ public class EnemyView : MonoBehaviour, IDamageable
                     break;
 
                 case "Health":
-                    _healthPresenter.SetHealth(change.Value.ConvertTo<int>());
-                    break;
-
-                case "IsSpawned":
                     //_healthPresenter.SetHealth(change.Value.ConvertTo<int>());
+                    _enemyHealthView.SetHealth(change.Value.ConvertTo<int>());
                     break;
             }
         }

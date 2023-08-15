@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 1258733566326465705}
   - component: {fileID: 6650815733625031309}
   - component: {fileID: 2332329639632857536}
+  - component: {fileID: 1111695236325802305}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Untagged
@@ -135,6 +136,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _background: {fileID: 6265164301703560919}
   _progress: {fileID: 1109789107805112423}
+--- !u!114 &1111695236325802305
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8523221920069871624}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 482cabd95f0ea5448a9206fc435558b0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _progressBarRotator: {fileID: 9160647056290541913}
 --- !u!1001 &346490120958632379
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -482,5 +496,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &9160647056290541913 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4528548859044209518, guid: 146586d8298125d4ab2c5fc9c8c9f4ff, type: 3}
+  m_PrefabInstance: {fileID: 4753976875351036471}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9702dd23f076d84aa0198f242ec948e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 

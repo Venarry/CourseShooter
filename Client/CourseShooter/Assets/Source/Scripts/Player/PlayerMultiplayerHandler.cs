@@ -63,7 +63,7 @@ public class PlayerMultiplayerHandler : MonoBehaviour
         _multiplayerHandler.SendPlayerData("OnTeamIndexChanged", index);
     }
 
-    private void OnKilled(ShootData shootData)
+    private void OnKilled(ShooterData shootData)
     {
         _multiplayerHandler.SendPlayerData("OnKilled", shootData);
     }

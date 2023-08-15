@@ -194,7 +194,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 599388e609bdb80408a0fda946d147d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Damage: 4
+  Damage: 6
   _cooldown: 0.15
   _shootPoint: {fileID: 7815316337080809169}
 --- !u!1 &9020027819197356121

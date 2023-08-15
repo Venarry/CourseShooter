@@ -5,21 +5,25 @@ public class PlayerRotation : MonoBehaviour
 {
     [SerializeField] private Camera _camera;
 
+    private MainCameraHolder _cameraHolder;
     private Vector3 _currentRotation;
     private float _sensetivity = 10;
 
     public event Action<Vector3> RotationXChanged;
 
-    public void SetBehaviourState(bool state)
+    public void Init(MainCameraHolder cameraHolder)
     {
-        _camera.gameObject.SetActive(state);
+        _cameraHolder = cameraHolder;
+        _cameraHolder.SetCamera(_camera);
+    }
+
+    public void ShowCamera()
+    {
+        _cameraHolder.SetCamera(_camera);
     }
 
     public void Rotate()
     {
-        //_camera.transform.localRotation = Quaternion.Euler(_currentRotation.x, 0, 0);
-        //transform.rotation = Quaternion.Euler(0, _currentRotation.y, 0);
-
         _camera.transform.localEulerAngles = new Vector3(_currentRotation.x, 0, 0);
         transform.eulerAngles = new Vector3(0, _currentRotation.y, 0);
         _currentRotation.y = transform.localRotation.eulerAngles.y;

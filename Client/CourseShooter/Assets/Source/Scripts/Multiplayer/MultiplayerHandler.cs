@@ -21,9 +21,10 @@ public class MultiplayerHandler : ColyseusManager<MultiplayerHandler>
     public void Init(ChatView chatView, 
         SpawnPointsDataSource spawnPointsDataSource,
         MapScoreView mapScoreView,
-        TeamSelector teamSelector)
+        TeamSelector teamSelector,
+        EnemyFactory enemyFactory)
     {
-        _enemyFactory = new();
+        _enemyFactory = enemyFactory;
         _chatView = chatView;
         _teamSelector = teamSelector;
         _spawnPointsDataSource = spawnPointsDataSource;
@@ -57,7 +58,7 @@ public class MultiplayerHandler : ColyseusManager<MultiplayerHandler>
 
         _room.State.players.OnAdd += OnPlayerAdd;
         _room.State.players.OnRemove += OnHeroRemove;
-        _room.State.Score.OnAdd += _mapScoreView.OnScoreAdd;
+        _room.State.Score.OnAdd += _mapScoreView.OnScoreTeamAdd;
 
         _room.OnMessage<string>("Shoot", OnShoot);
         _room.OnMessage<string>("MessageSent", OnMessageSent);
@@ -74,7 +75,7 @@ public class MultiplayerHandler : ColyseusManager<MultiplayerHandler>
         if (_spawnedEnemys.ContainsKey(ownerId) == false)
             return;
 
-        ShootData ownerData = new(_spawnedEnemys[ownerId].TeamIndex);
+        ShooterData ownerData = new(_spawnedEnemys[ownerId].TeamIndex);
         _spawnedEnemys[ownerId].Shoot(ownerData);
     }
 
