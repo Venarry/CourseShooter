@@ -13,9 +13,6 @@ public class MultiplayerHandler : ColyseusManager<MultiplayerHandler>
     private TeamSelector _teamSelector;
     private MapScoreView _mapScoreView;
 
-    private Vector3 _spawnPosition;
-    private int _currentTeamIndex;
-
     public string SessionId => _room.SessionId;
 
     public void Init(ChatView chatView, 
@@ -43,18 +40,7 @@ public class MultiplayerHandler : ColyseusManager<MultiplayerHandler>
 
     public async void JoinRoom()
     {
-        TeamsDataSource teamsDataSource = new(teamsCount: 2);
-
-        _currentTeamIndex = Random.Range(0, 2); //teamsDataSource.AddPlayerToSmallestTeam();
-        _spawnPosition = _spawnPointsDataSource.GetRandomSpawnPosition(_currentTeamIndex);
-
-        Dictionary<string, object> startPlayerData = new()
-        {
-            { "Position", new MyVector3(_spawnPosition) },
-            { "TeamIndex", _currentTeamIndex }
-        };
-
-        _room = await client.JoinOrCreate<State>("state_handler", startPlayerData);
+        _room = await client.JoinOrCreate<State>("state_handler");
 
         _room.State.players.OnAdd += OnPlayerAdd;
         _room.State.players.OnRemove += OnHeroRemove;

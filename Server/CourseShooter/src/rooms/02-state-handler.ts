@@ -228,7 +228,7 @@ export class StateHandlerRoom extends Room<State> {
         this.onMessage("OnPlayerSpawn", (client, position) => 
         {
             var spawnPosition = new MyVector3(position.x, position.y, position.z);
-            this.state.SetPlayerPosition(client.sessionId, spawnPosition);
+            //this.state.SetPlayerPosition(client.sessionId, spawnPosition);
             this.state.SetSpawnState(client.sessionId, true);
             this.broadcast("SpawnPlayer", client.sessionId, { except: client });
         });

@@ -72,11 +72,13 @@ public class PlayerView : MonoBehaviour, IDamageable
 
         _healthPresenter.Disable();
         _playerMovement.PositionChanged -= OnPositionChanged;
+        _playerMovement.DirectionChanged -= OnDirectionChanged;
         _playerCameraRotation.RotationXChanged -= OnRotationXChanged;
         _playerWeaponView.WeaponAdded -= OnWeaponAdded;
         _playerWeaponView.WeaponSwitched -= OnWeaponSwitched;
         _playerWeaponView.Shooted -= OnShoot;
         _healthPresenter.HealthChanged -= OnHealthChanged;
+        _healthPresenter.HealthOver -= OnHealthOver;
     }
 
     private void Update()

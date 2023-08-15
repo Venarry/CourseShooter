@@ -46,12 +46,4 @@ public class MapScoreView : MonoBehaviour
     {
         _teamsScore[teamindex].text = score.ToString();
     }
-
-    private void OnScoreChange(List<DataChange> changes)
-    {
-        foreach (var change in changes)
-        {
-
-        }
-    }
 }
