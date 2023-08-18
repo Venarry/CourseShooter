@@ -2,11 +2,11 @@ using UnityEngine;
 
 public class WeaponFactory
 {
-    public WeaponView Create(string prefabPath)
+    public WeaponView Create(string prefabPath, MainCameraHolder mainCameraHolder)
     {
         WeaponView weaponPrefab = Resources.Load<WeaponView>(prefabPath);
         WeaponView weapon = Object.Instantiate(weaponPrefab);
-        weapon.SetPath(prefabPath);
+        weapon.Init(prefabPath, mainCameraHolder);
 
         return weapon;
     }

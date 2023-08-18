@@ -8,9 +8,9 @@ public class EnemyRotation : MonoBehaviour
 
     public float HeadRotationX => _head.transform.localRotation.eulerAngles.x;
 
-    private void Update()
+    private void FixedUpdate()
     {
-        float lerpValue = 0.4f;
+        float lerpValue = 1f;
         _targetRotation.x = Mathf.LerpAngle(_targetRotation.x, _newRotation.x, lerpValue);
         _targetRotation.y = Mathf.LerpAngle(_targetRotation.y, _newRotation.y, lerpValue);
 

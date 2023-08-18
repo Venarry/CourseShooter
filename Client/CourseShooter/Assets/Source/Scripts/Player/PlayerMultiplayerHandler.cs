@@ -7,7 +7,7 @@ using UnityEngine;
 public class PlayerMultiplayerHandler : MonoBehaviour
 {
     private PlayerView _playerView;
-    private MultiplayerHandler _multiplayerHandler;
+    private TeamMatchMultiplayerHandler _multiplayerHandler;
 
     private bool _isInitialized;
 
@@ -16,7 +16,7 @@ public class PlayerMultiplayerHandler : MonoBehaviour
         _playerView = GetComponent<PlayerView>();
     }
 
-    public void Init(MultiplayerHandler multiplayerHandler)
+    public void Init(TeamMatchMultiplayerHandler multiplayerHandler)
     {
         enabled = false;
 
@@ -68,9 +68,10 @@ public class PlayerMultiplayerHandler : MonoBehaviour
         _multiplayerHandler.SendPlayerData("OnKilled", shootData);
     }
 
-    private void OnShooted()
+    private void OnShooted(ShootInfo shootInfo)
     {
-        _multiplayerHandler.SendPlayerData("OnShoot", _multiplayerHandler.SessionId);
+        string data = JsonUtility.ToJson(shootInfo);
+        _multiplayerHandler.SendPlayerData("OnShoot", data);
     }
 
     private void OnWeaponSwitched(int weaponIndex)

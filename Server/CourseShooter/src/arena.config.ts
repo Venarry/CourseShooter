@@ -13,6 +13,7 @@ import { StateHandlerRoom } from "./rooms/02-state-handler";
 import { AuthRoom } from "./rooms/03-auth";
 import { ReconnectionRoom } from './rooms/04-reconnection';
 import { CustomLobbyRoom } from './rooms/07-custom-lobby-room';
+import { MyLobby } from "./rooms/MyLobby";
 
 export default Arena({
     getId: () => "Your Colyseus App",
@@ -47,6 +48,9 @@ export default Arena({
 
         // Define "reconnection" room
         gameServer.define("reconnection", ReconnectionRoom)
+            .enableRealtimeListing();
+
+        gameServer.define("MyLobbyRoom", MyLobby)
             .enableRealtimeListing();
 
         // Define "custom_lobby" room

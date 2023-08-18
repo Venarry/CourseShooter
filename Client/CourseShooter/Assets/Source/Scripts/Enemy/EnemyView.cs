@@ -18,6 +18,7 @@ public class EnemyView : MonoBehaviour, IDamageable
     private PlayerWeaponView _playerWeaponView;
     private EnemyHealthView _enemyHealthView;
     private Player _myPlayer;
+    private MainCameraHolder _mainCameraHolder;
 
     private Vector3 _moveDirection = Vector3.zero;
     private bool _isInitialized;
@@ -33,11 +34,12 @@ public class EnemyView : MonoBehaviour, IDamageable
         _enemyHealthView = GetComponent<EnemyHealthView>();
     }
 
-    public void Init(Player myPlayer)
+    public void Init(Player myPlayer, MainCameraHolder mainCameraHolder)
     {
         gameObject.SetActive(false);
 
         _myPlayer = myPlayer;
+        _mainCameraHolder = mainCameraHolder;
         _isInitialized = true;
 
         gameObject.SetActive(true);
@@ -75,9 +77,9 @@ public class EnemyView : MonoBehaviour, IDamageable
 
     public void TakeDamage(int value, ShooterData ownerData) { }
 
-    public void Shoot(ShooterData ownerData)
+    public void Shoot(ShootInfo shootInfo)
     {
-        _playerWeaponView.Shoot(ownerData);
+        _playerWeaponView.Shoot(shootInfo, false);
     }
 
     public void SetTeamindex(int index)
@@ -126,7 +128,7 @@ public class EnemyView : MonoBehaviour, IDamageable
     private void OnWeaponPathsAdded(int key, string value)
     {
         bool haveSwith = _myPlayer.ActiveWeapon == key;
-        _playerWeaponView.AddWeapon(new WeaponFactory().Create(value), haveSwith);
+        _playerWeaponView.AddWeapon(new WeaponFactory().Create(value, _mainCameraHolder), haveSwith);
     }
 
     private void OnDataChange(List<DataChange> changes)

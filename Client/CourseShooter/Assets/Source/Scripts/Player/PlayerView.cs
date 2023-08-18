@@ -24,9 +24,10 @@ public class PlayerView : MonoBehaviour, IDamageable
     public event Action<int> HealthChanged;
     public event Action<int> TeamIndexChanged;
     public event Action<ShooterData> Killed;
-    public event Action Shooted;
+    public event Action<ShootInfo> Shooted;
 
     public int TeamIndex { get; private set; }
+    public string Id { get; private set; }
 
     private void Awake()
     {
@@ -37,7 +38,7 @@ public class PlayerView : MonoBehaviour, IDamageable
         MapSettings.HideCursor();
     }
 
-    public void Init(HealthPresenter healthPresenter, IInputsHandler inputsHandler, int teamNumber)
+    public void Init(HealthPresenter healthPresenter, IInputsHandler inputsHandler, int teamNumber, string id)
     {
         gameObject.SetActive(false);
 
@@ -45,6 +46,7 @@ public class PlayerView : MonoBehaviour, IDamageable
         _healthPresenter = healthPresenter;
         _progressBar.SetValue(_healthPresenter.HealthNormalized);
         _isInitialized = true;
+        Id = id;
 
         gameObject.SetActive(true);
     }
@@ -172,8 +174,12 @@ public class PlayerView : MonoBehaviour, IDamageable
     {
         if (_inputsHandler.IsPressedShoot == true)
         {
-            ShooterData ownerData = new(TeamIndex);
-            _playerWeaponView.Shoot(ownerData);
+            ShooterData shooterData = new(TeamIndex, Id);
+            ShootInfo shootInfo = new();
+            shootInfo.SetShooterData(shooterData);
+
+
+            _playerWeaponView.Shoot(shootInfo, true);
             return;
         }
 
@@ -209,9 +215,9 @@ public class PlayerView : MonoBehaviour, IDamageable
         WeaponSwitched?.Invoke(weaponIndex);
     }
 
-    private void OnShoot()
+    private void OnShoot(ShootInfo shootInfo)
     {
-        Shooted?.Invoke();
+        Shooted?.Invoke(shootInfo);
     }
 
     private void OnHealthOver(ShooterData ownerData)

@@ -62,7 +62,7 @@ public class ChatView : MonoBehaviour
         if (message == "")
             return;
 
-        MultiplayerHandler.Instance.SendPlayerData("MessageSent", message);
+        StateHandlerRoom.Instance.SendPlayerData("MessageSent", message);
         _inputField.text = "";
         _inputField.ActivateInputField();
     }

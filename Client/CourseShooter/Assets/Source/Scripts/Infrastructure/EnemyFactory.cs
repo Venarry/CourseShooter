@@ -25,7 +25,7 @@ public class EnemyFactory
         HealthPresenter healthPresenter = new(healthModel);
         enemy.GetComponent<EnemyHealthView>().Init(healthPresenter, _cameraHolder);
 
-        enemy.Init(thisPlayer);
+        enemy.Init(thisPlayer, _cameraHolder);
 
         return enemy;
     }

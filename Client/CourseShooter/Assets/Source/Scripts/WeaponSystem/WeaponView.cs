@@ -6,11 +6,12 @@ public abstract class WeaponView : MonoBehaviour
     [SerializeField] private float _cooldown;
     private Transform _parent;
     private float _timeAfterShoot;
+    private MainCameraHolder _mainCameraHolder;
 
     public string PrefabPath { get; private set; }
     protected bool IsReadyToShoot => _timeAfterShoot > _cooldown;
 
-    public abstract bool TryShoot(ShooterData ownerData);
+    public abstract bool TryShoot(ShootInfo shootInfo, bool useShootPoint);
 
     public void Update()
     {
@@ -22,9 +23,10 @@ public abstract class WeaponView : MonoBehaviour
         transform.SetPositionAndRotation(_parent.position, _parent.rotation);*/
     }
 
-    public void SetPath(string path)
+    public void Init(string path, MainCameraHolder mainCameraHolder)
     {
         PrefabPath = path;
+        _mainCameraHolder = mainCameraHolder;
     }
 
     public void SetParent(Transform parent)
@@ -44,6 +46,21 @@ public abstract class WeaponView : MonoBehaviour
     {
         gameObject.SetActive(false);
     }
+
+    protected void Enbable()
+    {
+        _mainCameraHolder.CameraChanged += OnCameraChanged;
+    }
+
+    protected void Disable()
+    {
+        _mainCameraHolder.CameraChanged -= OnCameraChanged;
+    }
+
+    protected virtual void OnCameraChanged(Camera camera) { }
+
+    protected Camera GetMainCamera() =>
+        _mainCameraHolder.ActiveCamera;
 
     protected void ResetShootTime()
     {

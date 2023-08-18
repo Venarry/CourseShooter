@@ -6,16 +6,17 @@ public class SphereBullet : Bullet
     private float _destroyTimer = 8f;
     private float _lifeTime;
 
-    public void Init(Transform shootPoint, int damage, ShooterData shootData)
+    public void Init(Vector3 shootPoint, Vector3 shootDirection, ShooterData shooterData, int damage)
     {
         SetDamage(damage);
         SetShootPoint(shootPoint);
-        SetShootData(shootData);
+        SetShootRotation(shootDirection);
+        SetShootData(shooterData);
     }
 
     private void FixedUpdate()
     {
-        transform.position += transform.forward;
+        transform.position += transform.forward * 0.05f;
 
         _lifeTime += Time.deltaTime;
 

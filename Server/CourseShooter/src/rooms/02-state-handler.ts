@@ -1,5 +1,6 @@
-import { Room, Client, ClientState } from "colyseus";
+import { Room, Client, ClientState, updateLobby, LobbyRoom } from "colyseus";
 import { Schema, type, MapSchema, ArraySchema } from "@colyseus/schema";
+import { MetaData } from "./MetaData";
 
 export class MyVector3 extends Schema
 {
@@ -136,6 +137,9 @@ export class Player extends Schema
     SetTeam(index: number)
     {
         this.TeamIndex = index;
+        //player.Position.x = data.x;
+        //player.Position.y = data.y;
+        //player.Position.z = data.z;
     }
 }
 
@@ -145,6 +149,9 @@ export class State extends Schema {
 
     @type({ map: MapScoreData })
     Score = new MapSchema<MapScoreData>();
+
+    @type( "string" )
+    MapName;
     
     AddScore(teamIndex: number)
     {
@@ -160,9 +167,10 @@ export class State extends Schema {
         }
     }
 
-    createPlayer(sessionId: string, data: any) 
+    createPlayer(sessionId: string, position: MyVector3) 
     {
         const player = new Player(sessionId);
+        player.SetMovePosition(position);
         this.players.set(sessionId, player);
     }
 
@@ -212,25 +220,32 @@ export class State extends Schema {
 
     SetTeam(sessionId: string, value: number)
     {
-        
         this.players.get(sessionId).SetTeam(value);
     }
 }
 
-export class StateHandlerRoom extends Room<State> {
+export class StateHandlerRoom extends Room<State>
+{
     maxClients = 4;
 
-    onCreate (options) {
+    onCreate (options) 
+    {
         console.log("StateHandlerRoom created!", options);
 
         this.setState(new State());
 
+        this.setMetadata(options).then(() => updateLobby(this));
+        //this.setMetadata({ Password: "123" });
+        //this.metadata.Password = "123";
+
+        console.log(this.metadata);
+
         this.onMessage("OnPlayerSpawn", (client, position) => 
         {
             var spawnPosition = new MyVector3(position.x, position.y, position.z);
-            //this.state.SetPlayerPosition(client.sessionId, spawnPosition);
-            this.state.SetSpawnState(client.sessionId, true);
-            this.broadcast("SpawnPlayer", client.sessionId, { except: client });
+            this.state.createPlayer(client.sessionId, spawnPosition);
+            //this.state.SetSpawnState(client.sessionId, true);
+            //this.broadcast("SpawnPlayer", client.sessionId, { except: client });
         });
 
         this.onMessage("SetPosition", (client, position) => 
@@ -289,8 +304,7 @@ export class StateHandlerRoom extends Room<State> {
     }
 
     onJoin (client: Client, data: any) {
-        client.send("hello", "world");
-        this.state.createPlayer(client.sessionId, data);
+        //this.state.createPlayer(client.sessionId, data);
     }
 
     onLeave (client) {

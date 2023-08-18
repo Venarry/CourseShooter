@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Bootstrapper : MonoBehaviour
 {
-    [SerializeField] private MultiplayerHandler _multiplayerHandler;
+    [SerializeField] private TeamMatchMultiplayerHandler _multiplayerHandler;
     [SerializeField] private MapScoreView _mapScoreView;
     [SerializeField] private MainCameraHolder _cameraHolder;
     [SerializeField] private SpawnPointsDataSource _spawnPointsDataSource;
@@ -21,13 +21,12 @@ public class Bootstrapper : MonoBehaviour
         PlayerRespawner playerRespawner = new(_spawnPointsDataSource);
 
         _teamSelector.Init(playerRespawner, playerFactory);
-        _multiplayerHandler.Init(_chatView, _spawnPointsDataSource, _mapScoreView, _teamSelector, enemyFactory);
+        _multiplayerHandler.Init(_chatView, _mapScoreView, _teamSelector, enemyFactory);
         _cameraHolder.SetCamera(_observerCamera);
     }
 
     private void Start()
     {
-        _multiplayerHandler.InitClient();
         _multiplayerHandler.JoinRoom();
     }
 

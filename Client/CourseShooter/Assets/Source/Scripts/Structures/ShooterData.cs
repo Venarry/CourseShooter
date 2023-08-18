@@ -1,9 +1,24 @@
+using System;
+
+[Serializable]
 public struct ShooterData
 {
-    public ShooterData(int ownerTeamIndex)
+    public ShooterData(int ownerTeamIndex, string sessionId)
     {
         TeamIndex = ownerTeamIndex;
+        ClientId = sessionId;
     }
 
-    public int TeamIndex { get; private set; }
+    public string ClientId;
+    public int TeamIndex;
+
+    public void SetTeamIndex(int index)
+    {
+        TeamIndex = index;
+    }
+
+    public void SetClientId(string id)
+    {
+        ClientId = id;
+    }
 }

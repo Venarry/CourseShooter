@@ -5,9 +5,14 @@ public abstract class Bullet : MonoBehaviour
     protected int Damage { get; private set; }
     protected ShooterData ShootData { get; private set; }
 
-    protected void SetShootPoint(Transform shootPoint)
+    protected void SetShootPoint(Vector3 shootPoint)
     {
-        transform.SetPositionAndRotation(shootPoint.position, shootPoint.rotation);
+        transform.position = shootPoint;
+    }
+
+    protected void SetShootRotation(Vector3 shootPoint)
+    {
+        transform.eulerAngles = shootPoint;
     }
 
     protected void SetDamage(int damage)

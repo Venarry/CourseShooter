@@ -32,8 +32,8 @@ public class TeamSelector : MonoBehaviour
         if(_playerView == null)
         {
             Vector3 respawnPosition = _playerRespawner.GetRandomPosition(teamIndex);
+            StateHandlerRoom.Instance.SendPlayerData("OnPlayerSpawn", respawnPosition);
             _playerView = _playerFactory.Create(respawnPosition, teamIndex, true);
-            MultiplayerHandler.Instance.SendPlayerData("OnPlayerSpawn", respawnPosition);
             SetVisibility(false);
         }
         else

@@ -2,21 +2,12 @@ using UnityEngine;
 
 public class BulletsFactory
 {
-    private readonly SphereBullet _sphereBulletPrefab = Resources.Load<SphereBullet>(ResourcesPath.SphereBullet);
     private readonly SphereBullet _pistolBulletPrefab = Resources.Load<SphereBullet>(ResourcesPath.PistolBullet);
 
-    public Bullet CreateSphereBullet(Transform parent, int damage, ShooterData shooterData)
-    {
-        SphereBullet bullet = Object.Instantiate(_sphereBulletPrefab);
-        bullet.Init(parent, damage, shooterData);
-
-        return bullet;
-    }
-
-    public Bullet CreatePistolBullet(Transform parent, int damage, ShooterData shootData)
+    public Bullet CreatePistolBullet(Vector3 shootPoint, Vector3 shootDirection, ShooterData shooterData, int damage)
     {
         SphereBullet bullet = Object.Instantiate(_pistolBulletPrefab);
-        bullet.Init(parent, damage, shootData);
+        bullet.Init(shootPoint, shootDirection, shooterData, damage);
 
         return bullet;
     }

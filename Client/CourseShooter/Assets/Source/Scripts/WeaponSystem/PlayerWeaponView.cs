@@ -11,7 +11,7 @@ public class PlayerWeaponView : MonoBehaviour
 
     public event Action<string> WeaponAdded;
     public event Action<int> WeaponSwitched;
-    public event Action Shooted;
+    public event Action<ShootInfo> Shooted;
 
     public void Init(PlayerWeaponPresenter playerWeaponPresenter)
     {
@@ -43,15 +43,15 @@ public class PlayerWeaponView : MonoBehaviour
         _playerWeaponPresenter.WeaponSwitched -= OnWeaponSwitched;
     }
 
-    public void Shoot(ShooterData ownerData)
+    public void Shoot(ShootInfo shootInfo, bool useShootPoint)
     {
         if (_activeWeapon == null)
             return;
 
-        if (_activeWeapon.TryShoot(ownerData) == false)
+        if (_activeWeapon.TryShoot(shootInfo, useShootPoint) == false)
             return;
 
-        Shooted?.Invoke();
+        Shooted?.Invoke(shootInfo);
     }
 
     public void AddWeapon(WeaponView weaponView, bool haveSwitch)
