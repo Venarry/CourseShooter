@@ -8,6 +8,7 @@ public class EnemyMovement : MonoBehaviour
 
     private Vector3 _moveDirection = Vector3.zero;
     private Vector3 _targetPosition = Vector3.zero;
+    private Vector3 _previousPosition = Vector3.zero;
 
     public event Action<bool> GroundedStateChanged;
     public event Action<Vector3> MoveDirectionChanged;
@@ -34,7 +35,17 @@ public class EnemyMovement : MonoBehaviour
 
     public void SetTargetPosition(Vector3 targetPosition)
     {
+        Debug.Log(Vector3.Distance(_previousPosition, targetPosition));
+
+        if(Vector3.Distance(_previousPosition, targetPosition) > 1f)
+        {
+            _characterController.enabled = false;
+            transform.position = targetPosition;
+            _characterController.enabled = true;
+        }
+
         _targetPosition = targetPosition;
+        _previousPosition = targetPosition;
 
         /*float teleportDistance = 2f;
 
