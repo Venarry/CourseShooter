@@ -5,7 +5,9 @@ public class HealthPresenter
     private readonly HealthModel _healthModel;
 
     public event Action HealthChanged;
-    public event Action<ShooterData> HealthOver;
+    public event Action HealthSet;
+    public event Action HealthOver;
+    public event Action<ShooterData> Killed;
 
     public HealthPresenter(HealthModel healthModel)
     {
@@ -19,12 +21,21 @@ public class HealthPresenter
     public void Enable()
     {
         _healthModel.HealthChanged += OnHealthChanged;
+        _healthModel.HealthSet += OnHealthSet;
+        _healthModel.HealthOver += OnHealthOver;
         _healthModel.Killed += OnKilled;
+    }
+
+    private void OnHealthSet()
+    {
+        HealthSet?.Invoke();
     }
 
     public void Disable()
     {
         _healthModel.HealthChanged -= OnHealthChanged;
+        _healthModel.HealthSet -= OnHealthSet;
+        _healthModel.HealthOver -= OnHealthOver;
         _healthModel.Killed -= OnKilled;
     }
 
@@ -58,8 +69,13 @@ public class HealthPresenter
         HealthChanged?.Invoke();
     }
 
+    private void OnHealthOver()
+    {
+        HealthOver?.Invoke();
+    }
+
     private void OnKilled(ShooterData ownerData)
     {
-        HealthOver?.Invoke(ownerData);
+        Killed?.Invoke(ownerData);
     }
 }

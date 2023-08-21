@@ -7,17 +7,17 @@ public class PlayerFactory
     private readonly WeaponFactory _weaponFactory = new();
 
     private TeamMatchMultiplayerHandler _multiplayerHandler;
-    private SpawnPointsDataSource _spawnPointsDataSource;
+    private PlayerRespawner _playerRespawner;
     private MainCameraHolder _cameraHolder;
     private Camera _deathCamera;
 
-    public void SetPlayerData(TeamMatchMultiplayerHandler multiplayerHandler, 
-        SpawnPointsDataSource spawnPointsDataSource,
+    public void SetPlayerData(TeamMatchMultiplayerHandler multiplayerHandler,
+        PlayerRespawner playerRespawner,
         MainCameraHolder cameraHolder,
         Camera deathCamera)
     {
         _multiplayerHandler = multiplayerHandler;
-        _spawnPointsDataSource = spawnPointsDataSource;
+        _playerRespawner = playerRespawner;
         _cameraHolder = cameraHolder;
         _deathCamera = deathCamera;
     }
@@ -25,10 +25,8 @@ public class PlayerFactory
     public PlayerView Create(
         Vector3 position, 
         int teamNumber, 
-        bool isMultiplayer)
+        bool isMultiplayer, Player thisPlayer = null)
     {
-        PlayerRespawner playerRespawner = new(_spawnPointsDataSource);
-
         PlayerView player = Object.Instantiate(_prefab, position, Quaternion.identity);
 
         PlayerWeaponModel playerWeaponModel = new();
@@ -48,20 +46,21 @@ public class PlayerFactory
 
         if (isMultiplayer == true)
         {
-            player.AddComponent<PlayerMultiplayerHandler>().Init(_multiplayerHandler);
-            player.AddComponent<MultiplayerPlayerDieHandler>().Init(_deathCamera, _cameraHolder, playerRespawner);
+            player.AddComponent<PlayerMultiplayerHandler>().Init(_multiplayerHandler, thisPlayer);
+            player.AddComponent<MultiplayerPlayerDieHandler>().Init(_deathCamera, _cameraHolder, _playerRespawner);
             id = _multiplayerHandler.SessionId;
         }
 
         player.Init(healthPresenter, inputsHandler, teamNumber, id);
-        player.SetTeamIndex(teamNumber);
-        player.SetPosition(position);
+        //player.SetPosition(position);
 
         WeaponView minigun = _weaponFactory.Create(ResourcesPath.Minigun, _cameraHolder);
         player.AddWeapon(minigun);
 
         WeaponView pistol = _weaponFactory.Create(ResourcesPath.Pistol, _cameraHolder);
         player.AddWeapon(pistol);
+
+        _playerRespawner.SetPlayer(player);
 
         return player;
     }

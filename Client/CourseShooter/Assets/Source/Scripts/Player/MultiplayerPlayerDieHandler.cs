@@ -26,15 +26,15 @@ public class MultiplayerPlayerDieHandler : MonoBehaviour
 
     private void OnEnable()
     {
-        _playerView.Killed += OnKilled;
+        _playerView.HealthOver += OnKilled;
     }
 
     private void OnDisable()
     {
-        _playerView.Killed -= OnKilled;
+        _playerView.HealthOver -= OnKilled;
     }
 
-    private void OnKilled(ShooterData ownerData)
+    private void OnKilled()
     {
         StartCoroutine(Respawn());
     }
@@ -44,10 +44,10 @@ public class MultiplayerPlayerDieHandler : MonoBehaviour
         _playerView.SetBehaviourState(false);
         _cameraHolder.SetCamera(_followCamera);
 
-        yield return _waitForSeconds;
 
         _playerView.SetBehaviourState(true);
         _followCamera.gameObject.SetActive(false);
-        _playerRespawner.Respawn(_playerView);
+        yield return _waitForSeconds;
+        //_playerRespawner.Respawn();
     }
 }

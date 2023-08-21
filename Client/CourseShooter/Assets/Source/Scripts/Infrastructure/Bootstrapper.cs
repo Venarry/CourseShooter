@@ -12,16 +12,22 @@ public class Bootstrapper : MonoBehaviour
 
     private void Awake()
     {
+        TeamsDataSource teamsDataSource = new(2);
+        PlayerRespawner playerRespawner = new(_spawnPointsDataSource);
+        TeamsStateHandler teamsStateHandler = new(teamsDataSource, playerRespawner);
+        teamsStateHandler.Enable();
+
+        MultiplayerPlayerLauncher multiplayerPlayerLauncher = new(_teamSelector, _multiplayerHandler);
+        multiplayerPlayerLauncher.Enable();
+
         PlayerFactory playerFactory = new();
-        playerFactory.SetPlayerData(_multiplayerHandler, _spawnPointsDataSource, _cameraHolder, _observerCamera);
+        playerFactory.SetPlayerData(_multiplayerHandler, playerRespawner, _cameraHolder, _observerCamera);
 
         EnemyFactory enemyFactory = new();
-        enemyFactory.SetEnemyData(_cameraHolder);
+        enemyFactory.SetEnemyData(_cameraHolder, _multiplayerHandler);
 
-        PlayerRespawner playerRespawner = new(_spawnPointsDataSource);
-
-        _teamSelector.Init(playerRespawner, playerFactory);
-        _multiplayerHandler.Init(_chatView, _mapScoreView, _teamSelector, enemyFactory);
+        _teamSelector.Init(playerRespawner);
+        _multiplayerHandler.Init(_chatView, _mapScoreView, teamsDataSource, enemyFactory, playerFactory);
         _cameraHolder.SetCamera(_observerCamera);
     }
 

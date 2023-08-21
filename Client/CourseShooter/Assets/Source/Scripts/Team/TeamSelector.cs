@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class TeamSelector : MonoBehaviour
@@ -6,25 +8,35 @@ public class TeamSelector : MonoBehaviour
 
     private PlayerView _playerView;
     private PlayerRespawner _playerRespawner;
-    private PlayerFactory _playerFactory;
 
-    public void Init(PlayerRespawner playerRespawner, PlayerFactory playerFactory)
+    public event Action<Dictionary<string, object>> PlayerLaunched;
+
+    public void Init(PlayerRespawner playerRespawner)
     {
         _playerRespawner = playerRespawner;
-        _playerFactory = playerFactory;
     }
 
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.M))
         {
-            _selectionMenu.SetActive(_selectionMenu.activeInHierarchy == false);
+            SetVisibility(_selectionMenu.activeInHierarchy == false);
         }
+    }
+
+    public void SetPlayer(PlayerView playerView)
+    {
+        _playerView = playerView;
     }
 
     public void SetVisibility(bool state)
     {
         _selectionMenu.SetActive(state);
+
+        if(state == true)
+            MapSettings.ShowCursor();
+        else
+            MapSettings.HideCursor();
     }
 
     public void SelectTeam(int teamIndex)
@@ -32,17 +44,27 @@ public class TeamSelector : MonoBehaviour
         if(_playerView == null)
         {
             Vector3 respawnPosition = _playerRespawner.GetRandomPosition(teamIndex);
-            StateHandlerRoom.Instance.SendPlayerData("OnPlayerSpawn", respawnPosition);
-            _playerView = _playerFactory.Create(respawnPosition, teamIndex, true);
+
+            Dictionary<string, object> data = new()
+            {
+                { "Position", respawnPosition },
+                { "TeamIndex", teamIndex },
+            };
+
+            PlayerLaunched?.Invoke(data);
             SetVisibility(false);
+
+            MapSettings.HideCursor();
         }
         else
         {
             if(_playerView.TeamIndex != teamIndex)
             {
                 _playerView.SetTeamIndex(teamIndex);
-                _playerRespawner.Respawn(_playerView);
+                _playerRespawner.Respawn();
                 SetVisibility(false);
+
+                MapSettings.HideCursor();
             }
         }
     }

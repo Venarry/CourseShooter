@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 [RequireComponent(typeof(ProgressBar))]
@@ -9,6 +10,10 @@ public class EnemyHealthView : MonoBehaviour
     private HealthPresenter _healthPresenter;
     private MainCameraHolder _cameraHolder;
     private bool _isInitialized = false;
+
+    public event Action<int> HealthChanged;
+    public event Action<int> HealthSet;
+    public event Action HealthOver;
 
     private void Awake()
     {
@@ -36,6 +41,8 @@ public class EnemyHealthView : MonoBehaviour
 
         _healthPresenter.Enable();
         _healthPresenter.HealthChanged += OnHealthChanged;
+        _healthPresenter.HealthSet += OnHealthSet;
+        _healthPresenter.HealthOver += OnHealthOver;
         _cameraHolder.CameraChanged += OnCameraChanged;
     }
 
@@ -46,7 +53,14 @@ public class EnemyHealthView : MonoBehaviour
 
         _healthPresenter.Disable();
         _healthPresenter.HealthChanged -= OnHealthChanged;
+        _healthPresenter.HealthSet -= OnHealthSet;
+        _healthPresenter.HealthOver -= OnHealthOver;
         _cameraHolder.CameraChanged -= OnCameraChanged;
+    }
+
+    private void OnHealthOver()
+    {
+        HealthOver?.Invoke();
     }
 
     public void TakeDamage(int value, ShooterData shooterData)
@@ -65,6 +79,12 @@ public class EnemyHealthView : MonoBehaviour
     }
 
     private void OnHealthChanged()
+    {
+        _progressBar.SetValue(_healthPresenter.HealthNormalized);
+        HealthChanged?.Invoke(_healthPresenter.Health);
+    }
+
+    private void OnHealthSet()
     {
         _progressBar.SetValue(_healthPresenter.HealthNormalized);
     }

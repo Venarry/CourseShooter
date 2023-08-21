@@ -1,12 +1,11 @@
 using System;
-using Unity.VisualScripting;
 using UnityEngine;
 
 [RequireComponent(typeof(PlayerMovement))]
 [RequireComponent(typeof(PlayerRotation))]
 [RequireComponent(typeof(PlayerWeaponView))]
 [RequireComponent(typeof(ProgressBar))]
-public class PlayerView : MonoBehaviour, IDamageable
+public class PlayerView : MonoBehaviour, IDamageable, ITeamable
 {
     private PlayerMovement _playerMovement;
     private PlayerRotation _playerCameraRotation;
@@ -22,11 +21,15 @@ public class PlayerView : MonoBehaviour, IDamageable
     public event Action<string> WeaponAdded;
     public event Action<int> WeaponSwitched;
     public event Action<int> HealthChanged;
+    public event Action<int, ITeamable> TeamChanged;
     public event Action<int> TeamIndexChanged;
     public event Action<ShooterData> Killed;
+    public event Action HealthOver;
     public event Action<ShootInfo> Shooted;
+    public event Action Respawned;
 
     public int TeamIndex { get; private set; }
+    public bool IsAlive { get; private set; }
     public string Id { get; private set; }
 
     private void Awake()
@@ -44,9 +47,11 @@ public class PlayerView : MonoBehaviour, IDamageable
 
         _inputsHandler = inputsHandler;
         _healthPresenter = healthPresenter;
+        //SetTeamIndex(teamNumber);
+        Id = id;
+        IsAlive = true;
         _progressBar.SetValue(_healthPresenter.HealthNormalized);
         _isInitialized = true;
-        Id = id;
 
         gameObject.SetActive(true);
     }
@@ -64,7 +69,15 @@ public class PlayerView : MonoBehaviour, IDamageable
         _playerWeaponView.WeaponSwitched += OnWeaponSwitched;
         _playerWeaponView.Shooted += OnShoot;
         _healthPresenter.HealthChanged += OnHealthChanged;
+        _healthPresenter.HealthSet += OnHealthSet;
         _healthPresenter.HealthOver += OnHealthOver;
+        _healthPresenter.Killed += OnKilled;
+    }
+
+    private void OnHealthOver()
+    {
+        IsAlive = false;
+        HealthOver?.Invoke();
     }
 
     private void OnDisable()
@@ -80,7 +93,9 @@ public class PlayerView : MonoBehaviour, IDamageable
         _playerWeaponView.WeaponSwitched -= OnWeaponSwitched;
         _playerWeaponView.Shooted -= OnShoot;
         _healthPresenter.HealthChanged -= OnHealthChanged;
+        _healthPresenter.HealthSet -= OnHealthSet;
         _healthPresenter.HealthOver -= OnHealthOver;
+        _healthPresenter.Killed -= OnKilled;
     }
 
     private void Update()
@@ -124,10 +139,17 @@ public class PlayerView : MonoBehaviour, IDamageable
         }
     }
 
+    public void SetHealth(int value)
+    {
+        _healthPresenter.SetHealth(value);
+    }
+
     public void SetTeamIndex(int index)
     {
+        int previousTeam = TeamIndex;
         TeamIndex = index;
         TeamIndexChanged?.Invoke(TeamIndex);
+        TeamChanged?.Invoke(previousTeam, this);
     }
 
     public void SetPosition(Vector3 respawnPosition)
@@ -139,15 +161,11 @@ public class PlayerView : MonoBehaviour, IDamageable
     {
         _healthPresenter.Restore();
         _playerMovement.SetPosition(respawnPosition);
+        IsAlive = true;
+        Respawned?.Invoke();
     }
 
-    public void TakeDamage(int value, ShooterData ownerData)
-    {
-        if (ownerData.TeamIndex == TeamIndex)
-            return;
-
-        _healthPresenter.TakeDamage(value, ownerData);
-    }
+    public void TakeDamage(int value, ShooterData ownerData) { }
 
     public void AddWeapon(WeaponView weaponView)
     {
@@ -220,8 +238,9 @@ public class PlayerView : MonoBehaviour, IDamageable
         Shooted?.Invoke(shootInfo);
     }
 
-    private void OnHealthOver(ShooterData ownerData)
+    private void OnKilled(ShooterData ownerData)
     {
+        IsAlive = false;
         Killed?.Invoke(ownerData);
     }
 
@@ -229,5 +248,10 @@ public class PlayerView : MonoBehaviour, IDamageable
     {
         _progressBar.SetValue(_healthPresenter.HealthNormalized);
         HealthChanged?.Invoke(_healthPresenter.Health);
+    }
+
+    private void OnHealthSet()
+    {
+        _progressBar.SetValue(_healthPresenter.HealthNormalized);
     }
 }

@@ -1,4 +1,5 @@
 using Colyseus.Schema;
+using System;
 using System.Collections.Generic;
 using TMPro;
 using Unity.VisualScripting;
@@ -10,7 +11,7 @@ using UnityEngine;
 [RequireComponent(typeof(PlayerWeaponView))]
 [RequireComponent(typeof(ProgressBar))]
 [RequireComponent(typeof(EnemyHealthView))]
-public class EnemyView : MonoBehaviour, IDamageable
+public class EnemyView : MonoBehaviour, IDamageable, ITeamable
 {
     private EnemyMovement _enemyMovement;
     private EnemyAnimation _enemyAnimation;
@@ -19,11 +20,17 @@ public class EnemyView : MonoBehaviour, IDamageable
     private EnemyHealthView _enemyHealthView;
     private Player _myPlayer;
     private MainCameraHolder _mainCameraHolder;
+    private TeamMatchMultiplayerHandler _stateHandlerRoom;
 
     private Vector3 _moveDirection = Vector3.zero;
     private bool _isInitialized;
+    private string _sessionId;
+
+    public event Action<int, ITeamable> TeamChanged;
+    public event Action HealthOver;
 
     public int TeamIndex { get; private set; }
+    public bool IsAlive { get; private set; }
 
     private void Awake()
     {
@@ -34,12 +41,15 @@ public class EnemyView : MonoBehaviour, IDamageable
         _enemyHealthView = GetComponent<EnemyHealthView>();
     }
 
-    public void Init(Player myPlayer, MainCameraHolder mainCameraHolder)
+    public void Init(Player myPlayer, MainCameraHolder mainCameraHolder, TeamMatchMultiplayerHandler stateHandlerRoom, string sessionId)
     {
         gameObject.SetActive(false);
 
         _myPlayer = myPlayer;
         _mainCameraHolder = mainCameraHolder;
+        _stateHandlerRoom = stateHandlerRoom;
+        _sessionId = sessionId;
+        IsAlive = true;
         _isInitialized = true;
 
         gameObject.SetActive(true);
@@ -53,11 +63,31 @@ public class EnemyView : MonoBehaviour, IDamageable
         _enemyMovement.GroundedStateChanged += OnGroundedChanged;
         _enemyMovement.MoveDirectionChanged += OnVelocityChanged;
 
+        _enemyHealthView.HealthChanged += OnHealthChanged;
+        _enemyHealthView.HealthOver += OnHealthOver;
+
         _myPlayer.Position.OnChange += OnPositionChange;
         _myPlayer.Direction.OnChange += OnDirectionChange;
         _myPlayer.Rotation.OnChange += OnRotationChange;
         _myPlayer.WeaponPaths.OnAdd += OnWeaponPathsAdded;
         _myPlayer.OnChange += OnDataChange;
+    }
+
+    private void OnHealthOver()
+    {
+        IsAlive = false;
+        HealthOver?.Invoke();
+    }
+
+    private void OnHealthChanged(int health)
+    {
+        Dictionary<string, object> data = new()
+        {
+            { "Id", _sessionId },
+            { "Value", health },
+        };
+
+        _stateHandlerRoom.SendPlayerData("OnEnemyHealthChanged", data);
     }
 
     private void OnDisable()
@@ -68,6 +98,9 @@ public class EnemyView : MonoBehaviour, IDamageable
         _enemyMovement.GroundedStateChanged -= OnGroundedChanged;
         _enemyMovement.MoveDirectionChanged -= OnVelocityChanged;
 
+        _enemyHealthView.HealthChanged -= OnHealthChanged;
+        _enemyHealthView.HealthOver -= OnHealthOver;
+
         _myPlayer.Position.OnChange -= OnPositionChange;
         _myPlayer.Direction.OnChange -= OnDirectionChange;
         _myPlayer.Rotation.OnChange -= OnRotationChange;
@@ -75,16 +108,30 @@ public class EnemyView : MonoBehaviour, IDamageable
         _myPlayer.OnChange -= OnDataChange;
     }
 
-    public void TakeDamage(int value, ShooterData ownerData) { }
+    public void TakeDamage(int value, ShooterData ownerData)
+    {
+        
+        if (ownerData.TeamIndex == TeamIndex)
+            return;
+
+        _enemyHealthView.TakeDamage(value, ownerData);
+    }
+
+    public void Respawn()
+    {
+        IsAlive = true;
+    }
 
     public void Shoot(ShootInfo shootInfo)
     {
         _playerWeaponView.Shoot(shootInfo, false);
     }
 
-    public void SetTeamindex(int index)
+    public void SetTeamIndex(int index)
     {
+        int previousTeam = TeamIndex;
         TeamIndex = index;
+        TeamChanged?.Invoke(previousTeam, this);
     }
 
     public void SetMovePosition(Vector3 targetPosition)
@@ -142,11 +189,10 @@ public class EnemyView : MonoBehaviour, IDamageable
                     break;
 
                 case "TeamIndex":
-                    SetTeamindex(change.Value.ConvertTo<int>());
+                    SetTeamIndex(change.Value.ConvertTo<int>());
                     break;
 
                 case "Health":
-                    //_healthPresenter.SetHealth(change.Value.ConvertTo<int>());
                     _enemyHealthView.SetHealth(change.Value.ConvertTo<int>());
                     break;
             }

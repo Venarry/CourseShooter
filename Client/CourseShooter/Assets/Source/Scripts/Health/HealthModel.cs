@@ -3,6 +3,7 @@ using System;
 public class HealthModel
 {
     public event Action HealthChanged;
+    public event Action HealthSet;
     public event Action HealthOver;
     public event Action<ShooterData> Killed;
 
@@ -32,11 +33,13 @@ public class HealthModel
         if (value < 0)
         {
             value = 0;
-            HealthOver?.Invoke();
         }
 
         Value = value;
-        HealthChanged?.Invoke();
+        HealthSet?.Invoke();
+
+        if (Value <= 0)
+            HealthOver?.Invoke();
     }
 
     public void SetMaxHealth(int value)
@@ -49,7 +52,10 @@ public class HealthModel
 
     public void TakeDamage(int value, ShooterData ownerData)
     {
-        if(value < 0)
+        if (Value <= 0)
+            return;
+
+        if (value < 0)
             value = 0;
 
         Value -= value;

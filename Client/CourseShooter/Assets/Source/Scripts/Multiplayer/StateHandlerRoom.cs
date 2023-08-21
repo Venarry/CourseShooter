@@ -1,10 +1,6 @@
 using Colyseus;
-using GameDevWare.Serialization;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using UnityEditor;
-using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class StateHandlerRoom : ColyseusManager<StateHandlerRoom>
 {
@@ -43,7 +39,6 @@ public class StateHandlerRoom : ColyseusManager<StateHandlerRoom>
                 }
 
                 _room = await client.JoinById<State>(id);
-                
 
                 return true;
             }
@@ -52,11 +47,13 @@ public class StateHandlerRoom : ColyseusManager<StateHandlerRoom>
         return false;
     }
 
-    public async Task<bool> CreateRoom()
+    public async Task<bool> CreateRoom(string mapName)
     {
         Dictionary<string, object> roomMetaData = new()
         {
-            { "roomPassword", "123" },
+            { "RoomName", "MyRoom" },
+            { "MapName", mapName },
+            { "Password", "123" },
         };
 
         _room = await client.Create<State>("state_handler", roomMetaData);
@@ -66,37 +63,10 @@ public class StateHandlerRoom : ColyseusManager<StateHandlerRoom>
     public async Task<ColyseusRoomAvailable[]> GetRooms()
     {
         return await client.GetAvailableRooms();
-
-        /*
-        var rooms = await client.GetAvailableRooms();
-
-        foreach (ColyseusRoomAvailable room in rooms)
-        {
-            Debug.Log($"name {room.name}, maxClient {room.maxClients}, id {room.roomId}");
-        }
-        */
     }
 
     public void Leave()
     {
         _room.Leave();
     }
-
-    /*private void OnEnable()
-    {
-        _room.State.players.OnAdd += OnPlayerAdd;
-        _room.State.players.OnRemove += OnHeroRemove;
-        _room.State.Score.OnAdd += _mapScoreView.OnScoreTeamAdd;
-
-        _room.OnMessage<string>("Shoot", OnShoot);
-        _room.OnMessage<string>("MessageSent", OnMessageSent);
-        _room.OnMessage<string>("SpawnPlayer", OnSpawnPlayer);
-    }
-
-    private void AddListenner()
-    {
-        _room.OnMessage<string>("Shoot", OnShoot);
-        _room.OnMessage<string>("MessageSent", OnMessageSent);
-        _room.OnMessage<string>("SpawnPlayer", OnSpawnPlayer);
-    }*/
 }

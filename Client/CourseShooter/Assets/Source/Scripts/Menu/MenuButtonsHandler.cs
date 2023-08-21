@@ -15,13 +15,6 @@ public class MenuButtonsHandler : MonoBehaviour
         _stateHandlerRoom = StateHandlerRoom.Instance;
     }
 
-    public async void ShowRooms()
-    {
-        ColyseusRoomAvailable[] rooms = await _stateHandlerRoom.GetRooms();
-
-        _roomsListView.RefreshList(rooms);
-    }
-
     public async void JoinRoom()
     {
         if (await _stateHandlerRoom.JoinRoomById(_roomIdLabel.text) == false)
@@ -30,11 +23,11 @@ public class MenuButtonsHandler : MonoBehaviour
         SceneManager.LoadScene("Level1");
     }
 
-    public async void CreateRoom()
+    public async void CreateRoom(string mapName)
     {
-        if (await _stateHandlerRoom.CreateRoom() == false)
+        if (await _stateHandlerRoom.CreateRoom(mapName) == false)
             return;
 
-        SceneManager.LoadScene("Level1");
+        SceneManager.LoadScene(mapName);
     }
 }

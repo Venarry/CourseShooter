@@ -131,15 +131,13 @@ export class Player extends Schema
 
     SetHealth(value: number)
     {
+        console.log(value);
         this.Health = value;
     }
 
     SetTeam(index: number)
     {
         this.TeamIndex = index;
-        //player.Position.x = data.x;
-        //player.Position.y = data.y;
-        //player.Position.z = data.z;
     }
 }
 
@@ -213,7 +211,7 @@ export class State extends Schema {
         this.players.get(sessionId).SwitchWeapon(index);
     }
 
-    SetHealth(sessionId: string, value: number)
+    SetPlayerHealth(sessionId: string, value: number)
     {
         this.players.get(sessionId).SetHealth(value);
     }
@@ -240,10 +238,12 @@ export class StateHandlerRoom extends Room<State>
 
         console.log(this.metadata);
 
-        this.onMessage("OnPlayerSpawn", (client, position) => 
+        this.onMessage("OnPlayerSpawn", (client, data) => 
         {
-            var spawnPosition = new MyVector3(position.x, position.y, position.z);
+            var spawnPosition = new MyVector3(data.Position.x, data.Position.y, data.Position.z);
             this.state.createPlayer(client.sessionId, spawnPosition);
+            this.state.SetTeam(client.sessionId, data.TeamIndex);
+            console.log("spawn " + client.sessionId);
             //this.state.SetSpawnState(client.sessionId, true);
             //this.broadcast("SpawnPlayer", client.sessionId, { except: client });
         });
@@ -288,14 +288,25 @@ export class StateHandlerRoom extends Room<State>
             this.state.SetTeam(client.sessionId, data);
         });
 
-        this.onMessage("OnDamageTaken", (client, data) => 
+        this.onMessage("OnHealthChanged", (client, data) => 
         {
-            this.state.SetHealth(client.sessionId, data);
+            this.state.SetPlayerHealth(client.sessionId, data);
         });
 
-        this.onMessage("OnKilled", (client, data) => 
+        this.onMessage("OnEnemyHealthChanged", (client, data) => 
         {
-            this.state.AddScore(data.TeamIndex);
+            console.log("OnEnemyHealthChanged " + data.Id +" " + data.Value);
+            this.state.SetPlayerHealth(data.Id, data.Value);
+        });
+
+        this.onMessage("AddScore", (client, teamIndex) => 
+        {
+            this.state.AddScore(teamIndex);
+        });
+
+        this.onMessage("OnRespawn", (client, id) => 
+        {
+            this.broadcast("Respawn", id, {except: client});
         });
     }
 
@@ -304,7 +315,7 @@ export class StateHandlerRoom extends Room<State>
     }
 
     onJoin (client: Client, data: any) {
-        //this.state.createPlayer(client.sessionId, data);
+        
     }
 
     onLeave (client) {

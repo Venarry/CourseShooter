@@ -2,11 +2,9 @@ using UnityEngine;
 
 public class MinigunWeapon : WeaponView
 {
-    [SerializeField] private Transform _shootPoint;
-
     public override bool TryShoot(ShootInfo shootInfo, bool useShootPoint)
     {
-        _shootPoint = GetMainCamera().transform;
+        Transform shootPoint = GetMainCamera().transform;
 
         if (IsReadyToShoot == false)
             return false;
@@ -17,10 +15,8 @@ public class MinigunWeapon : WeaponView
         }
         else
         {
-            Debug.Log($"_shootPoint.position {_shootPoint.position} _shootPoint.eulerAngles {_shootPoint.eulerAngles}");
-            shootInfo.SetShootPoint(_shootPoint.position);
-            //shootInfo.SetShootRotation(_shootPoint.eulerAngles);
-            shootInfo.SetShootDirection(_shootPoint.forward - _shootPoint.position);
+            shootInfo.SetShootPoint(shootPoint.position);
+            shootInfo.SetShootDirection(shootPoint.forward - shootPoint.position);
             Shoot(shootInfo);
         }
 
@@ -42,10 +38,5 @@ public class MinigunWeapon : WeaponView
         }
 
         ResetShootTime();
-    }
-
-    protected override void OnCameraChanged(Camera camera)
-    {
-        _shootPoint = camera.transform;
     }
 }

@@ -3,6 +3,7 @@ using UnityEngine;
 public class PlayerRespawner
 {
     private readonly SpawnPointsDataSource _spawnPointsData;
+    private PlayerView _playerView;
 
     public PlayerRespawner(SpawnPointsDataSource spawnPointsData)
     {
@@ -12,10 +13,15 @@ public class PlayerRespawner
     public Vector3 GetRandomPosition(int teamIndex) =>
         _spawnPointsData.GetRandomSpawnPosition(teamIndex);
 
-    public Vector3 Respawn(PlayerView player)
+    public void SetPlayer(PlayerView playerView)
     {
-        Vector3 respawnPosition = _spawnPointsData.GetRandomSpawnPosition(player.TeamIndex);
-        player.Respawn(respawnPosition);
+        _playerView = playerView;
+    }
+
+    public Vector3 Respawn()
+    {
+        Vector3 respawnPosition = _spawnPointsData.GetRandomSpawnPosition(_playerView.TeamIndex);
+        _playerView.Respawn(respawnPosition);
 
         return respawnPosition;
     }

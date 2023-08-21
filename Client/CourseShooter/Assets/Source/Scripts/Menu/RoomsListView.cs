@@ -61,6 +61,7 @@ public class RoomsListView : MonoBehaviour
         string roomId = (string)roomData["roomId"];
         int clients = roomData["clients"].ConvertTo<int>();
         int maxClients = roomData["maxClients"].ConvertTo<int>();
+        string mapName = (string)metadata["MapName"];
 
         if (_showedRooms.ContainsKey(roomId) == false)
         {
@@ -69,19 +70,7 @@ public class RoomsListView : MonoBehaviour
             _showedRooms.Add(roomId, room);
         }
 
-        _showedRooms[roomId].SetRoomData(clients, maxClients);
-    }
-
-    public void RefreshList(ColyseusRoomAvailable[] rooms)
-    {
-        /*RemoveRooms();
-
-        foreach (var room in rooms)
-        {
-            RoomData roomData = Instantiate(_roomDataTemplate, _contentPoint);
-            roomData.Init(_stateHandlerRoom, room);
-            _showedRooms.Add(roomData);
-        }*/
+        _showedRooms[roomId].SetRoomData(clients, maxClients, mapName);
     }
 
     private void RemoveRooms()

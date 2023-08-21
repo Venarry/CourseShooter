@@ -35,9 +35,9 @@ public class EnemyMovement : MonoBehaviour
 
     public void SetTargetPosition(Vector3 targetPosition)
     {
-        Debug.Log(Vector3.Distance(_previousPosition, targetPosition));
+        float teleportDistance = 1f;
 
-        if(Vector3.Distance(_previousPosition, targetPosition) > 1f)
+        if (Vector3.Distance(_previousPosition, targetPosition) > teleportDistance)
         {
             _characterController.enabled = false;
             transform.position = targetPosition;
@@ -46,15 +46,6 @@ public class EnemyMovement : MonoBehaviour
 
         _targetPosition = targetPosition;
         _previousPosition = targetPosition;
-
-        /*float teleportDistance = 2f;
-
-        if (Vector3.Distance(transform.position, _targetPosition) > teleportDistance)
-        {
-            _characterController.enabled = false;
-            transform.position = _targetPosition;
-            _characterController.enabled = true;
-        }*/
     }
 
     public void SetPosition(Vector3 position)
