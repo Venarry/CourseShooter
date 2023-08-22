@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 public class StateHandlerRoom : ColyseusManager<StateHandlerRoom>
 {
     private ColyseusRoom<State> _room;
+    private LobbyRoomHandler _lobbyRoomHandler;
     public ColyseusRoom<State> Room => _room;
 
     protected override void Awake()
@@ -13,6 +14,7 @@ public class StateHandlerRoom : ColyseusManager<StateHandlerRoom>
 
         InitializeClient();
         DontDestroyOnLoad(this);
+        _lobbyRoomHandler = LobbyRoomHandler.Instance;
     }
 
     public void SendPlayerData(string key, object data = null)
@@ -38,6 +40,16 @@ public class StateHandlerRoom : ColyseusManager<StateHandlerRoom>
                     return false;
                 }
 
+                Dictionary<string, object> data = new()
+                {
+                    { "Version", GameConfig.Version },
+                };
+
+                string roomVersion = _lobbyRoomHandler.GetRoomVersionById(id);
+
+                if (GameConfig.Version != roomVersion)
+                    return false;
+
                 _room = await client.JoinById<State>(id);
 
                 return true;
@@ -54,6 +66,7 @@ public class StateHandlerRoom : ColyseusManager<StateHandlerRoom>
             { "RoomName", "MyRoom" },
             { "MapName", mapName },
             { "Password", "123" },
+            { "Version", GameConfig.Version },
         };
 
         _room = await client.Create<State>("state_handler", roomMetaData);

@@ -11,12 +11,13 @@ public class LobbyRoomHandler : ColyseusManager<LobbyRoomHandler>
 {
     private const string LobbyName = "MyLobbyRoom";
 
+    private ColyseusRoom<LobbyState> _activeLobby;
+
     public event Action<int> PlayersCountChanged;
+    private Dictionary<string, IndexedDictionary<string, object>> _rooms;
+
     public event Action<IndexedDictionary<string, object>> RoomDataUpdated;
     public event Action<string> RoomRemoved;
-
-    private ColyseusRoom<LobbyState> _lobby;
-    private Dictionary<string, IndexedDictionary<string, object>> _rooms;
 
     public Dictionary<string, IndexedDictionary<string, object>> Rooms => _rooms.ToDictionary(room => room.Key, room => room.Value);
 
@@ -38,14 +39,32 @@ public class LobbyRoomHandler : ColyseusManager<LobbyRoomHandler>
         LeaveLobby();
     }
 
+    public string GetRoomPasswordById(string lobbyId)
+    {
+        if (_rooms.ContainsKey(lobbyId) == false)
+            return null;
+
+        var metadata = (IndexedDictionary<string, object>)_rooms[lobbyId]["metadata"];
+        return (string)metadata["Password"];
+    }
+
+    public string GetRoomVersionById(string lobbyId)
+    {
+        if (_rooms.ContainsKey(lobbyId) == false)
+            return null;
+
+        var metadata = (IndexedDictionary<string, object>)_rooms[lobbyId]["metadata"];
+        return (string)metadata["Version"];
+    }
+
     private async void ConnectLobby()
     {
-        _lobby = await client.JoinOrCreate<LobbyState>(LobbyName);
-        _lobby.State.OnChange += OnStateDataChange;
+        _activeLobby = await client.JoinOrCreate<LobbyState>(LobbyName);
+        _activeLobby.State.OnChange += OnStateDataChange;
 
-        _lobby.OnMessage<List<IndexedDictionary<string, object>>>("rooms", OnRoomsLoad);
-        _lobby.OnMessage<List<object>>("+", OnRoomUpdate);
-        _lobby.OnMessage<string>("-", OnRoomRemoved);
+        _activeLobby.OnMessage<List<IndexedDictionary<string, object>>>("rooms", OnRoomsLoad);
+        _activeLobby.OnMessage<List<object>>("+", OnRoomUpdate);
+        _activeLobby.OnMessage<string>("-", OnRoomRemoved);
     }
 
     private void OnStateDataChange(List<DataChange> changes)
@@ -63,7 +82,7 @@ public class LobbyRoomHandler : ColyseusManager<LobbyRoomHandler>
 
     public void LeaveLobby()
     {
-        _lobby.Leave();
+        _activeLobby.Leave();
     }
 
     private void OnRoomRemoved(string roomID)
@@ -74,15 +93,15 @@ public class LobbyRoomHandler : ColyseusManager<LobbyRoomHandler>
 
     private void OnRoomUpdate(List<object> roomData)
     {
-        string roomID = (string)roomData[0];
         IndexedDictionary<string, object> mainData = (IndexedDictionary<string, object>)roomData[1];
         IndexedDictionary<string, object> metadata = (IndexedDictionary<string, object>)mainData["metadata"];
 
-        /*Debug.Log("data" + roomID);
-        foreach (var data in mainData)
+        string roomId = (string)mainData["roomId"];
+
+        if (_rooms.ContainsKey(roomId) == false)
         {
-            Debug.Log(data.Key + " || " + data.Value);
-        }*/
+            _rooms.Add(roomId, mainData);
+        }
 
         RoomDataUpdated?.Invoke(mainData);
     }
@@ -91,12 +110,10 @@ public class LobbyRoomHandler : ColyseusManager<LobbyRoomHandler>
     {
         foreach (IndexedDictionary<string, object> roomInfo in roomsInfo)
         {
-            foreach (var item in roomInfo)
-            {
-                Debug.Log($"{item.Key} || {item.Value}");
-            }
             IndexedDictionary<string, object> metadata = (IndexedDictionary<string, object>)roomInfo["metadata"];
             _rooms.Add((string)roomInfo["roomId"], roomInfo);
+            Debug.Log((string)roomInfo["roomId"]);
+
             RoomDataUpdated?.Invoke(roomInfo);
         }
     }

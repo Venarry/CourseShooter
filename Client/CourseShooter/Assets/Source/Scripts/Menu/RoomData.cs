@@ -10,6 +10,7 @@ public class RoomData : MonoBehaviour
     [SerializeField] private Button _roomButton;
     [SerializeField] private TMP_Text _roomName;
     [SerializeField] private TMP_Text _roomMap;
+    [SerializeField] private TMP_Text _version;
     [SerializeField] private TMP_Text _currentClientCount;
     [SerializeField] private TMP_Text _maxClientCount;
 
@@ -23,11 +24,12 @@ public class RoomData : MonoBehaviour
         _roomId = roomId;
     }
 
-    public void SetRoomData(int clientCount, int maxClientCount, string mapName)
+    public void SetRoomData(int clientCount, int maxClientCount, string mapName, string version)
     {
         _currentClientCount.text = clientCount.ToString();
         _maxClientCount.text = maxClientCount.ToString();
         _roomMap.text = mapName;
+        _version.text = version;
         _levelName = mapName;
     }
 

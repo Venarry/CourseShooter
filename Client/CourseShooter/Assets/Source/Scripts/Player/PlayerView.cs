@@ -25,8 +25,8 @@ public class PlayerView : MonoBehaviour, IDamageable, ITeamable
     public event Action<int> TeamIndexChanged;
     public event Action<ShooterData> Killed;
     public event Action HealthOver;
-    public event Action<ShootInfo> Shooted;
     public event Action Respawned;
+    public event Action<ShootInfo> Shooted;
     public event Action<ITeamable> Leaved;
 
     public int TeamIndex { get; private set; }

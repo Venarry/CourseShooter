@@ -8,7 +8,6 @@ public class MultiplayerPlayerDieHandler : MonoBehaviour
     private Camera _followCamera;
     private MainCameraHolder _cameraHolder;
     private PlayerView _playerView;
-    private PlayerRespawner _playerRespawner;
     private WaitForSeconds _waitForSeconds = new(RespawnTime);
 
     private void Awake()
@@ -17,11 +16,10 @@ public class MultiplayerPlayerDieHandler : MonoBehaviour
         _waitForSeconds = new(RespawnTime);
     }
 
-    public void Init(Camera followCamera, MainCameraHolder mainCameraHolder, PlayerRespawner playerRespawner)
+    public void Init(Camera followCamera, MainCameraHolder mainCameraHolder)
     {
         _followCamera = followCamera;
         _cameraHolder = mainCameraHolder;
-        _playerRespawner = playerRespawner;
     }
 
     private void OnEnable()

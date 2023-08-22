@@ -136,7 +136,6 @@ export class Player extends Schema
 
     SetHealth(value: number)
     {
-        console.log(value);
         this.Health = value;
     }
 
@@ -172,8 +171,6 @@ export class State extends Schema {
 
     SetScore(teamIndex: number, value: number)
     {
-        console.log(teamIndex);
-        console.log(value);
         if(this.Score.has(teamIndex.toString()))
         {
             this.Score.get(teamIndex.toString()).SetScore(value);
@@ -312,7 +309,6 @@ export class StateHandlerRoom extends Room<State>
 
         this.onMessage("OnEnemyHealthChanged", (client, data) => 
         {
-            console.log("OnEnemyHealthChanged " + data.Id +" " + data.Value);
             this.state.SetPlayerHealth(data.Id, data.Value);
         });
 
@@ -331,8 +327,12 @@ export class StateHandlerRoom extends Room<State>
         return true;
     }
 
-    onJoin (client: Client, data: any) {
-        
+    onJoin (client: Client, data: any) 
+    {
+        /*if(this.metadata.Version != data.Version)
+        {
+            this.lock();
+        }*/
     }
 
     onLeave (client) {

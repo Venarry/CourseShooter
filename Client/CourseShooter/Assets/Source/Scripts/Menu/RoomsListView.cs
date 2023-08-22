@@ -28,30 +28,14 @@ public class RoomsListView : MonoBehaviour
 
     private void OnEnable()
     {
-        _lobbyRoomHandler.PlayersCountChanged += OnPlayersCountChanged;
         _lobbyRoomHandler.RoomDataUpdated += OnRoomDataUpdated;
         _lobbyRoomHandler.RoomRemoved += OnRoomRemoved;
     }
 
-    private void OnRoomRemoved(string roomId)
-    {
-        if (_showedRooms.ContainsKey(roomId))
-        {
-            Destroy(_showedRooms[roomId]);
-            _showedRooms.Remove(roomId);
-        }
-    }
-
     private void OnDisable()
     {
-        _lobbyRoomHandler.PlayersCountChanged -= OnPlayersCountChanged;
         _lobbyRoomHandler.RoomDataUpdated -= OnRoomDataUpdated;
         _lobbyRoomHandler.RoomRemoved -= OnRoomRemoved;
-    }
-
-    private void OnPlayersCountChanged(int obj)
-    {
-        //throw new NotImplementedException();
     }
 
     private void OnRoomDataUpdated(IndexedDictionary<string, object> roomData)
@@ -62,6 +46,7 @@ public class RoomsListView : MonoBehaviour
         int clients = roomData["clients"].ConvertTo<int>();
         int maxClients = roomData["maxClients"].ConvertTo<int>();
         string mapName = (string)metadata["MapName"];
+        string version = (string)metadata["Version"];
 
         if (_showedRooms.ContainsKey(roomId) == false)
         {
@@ -70,7 +55,16 @@ public class RoomsListView : MonoBehaviour
             _showedRooms.Add(roomId, room);
         }
 
-        _showedRooms[roomId].SetRoomData(clients, maxClients, mapName);
+        _showedRooms[roomId].SetRoomData(clients, maxClients, mapName, version);
+    }
+
+    private void OnRoomRemoved(string roomId)
+    {
+        if (_showedRooms.ContainsKey(roomId))
+        {
+            Destroy(_showedRooms[roomId].gameObject);
+            _showedRooms.Remove(roomId);
+        }
     }
 
     private void RemoveRooms()

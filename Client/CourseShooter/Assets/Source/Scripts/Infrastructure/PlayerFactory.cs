@@ -47,7 +47,7 @@ public class PlayerFactory
         if (isMultiplayer == true)
         {
             player.AddComponent<PlayerMultiplayerHandler>().Init(_multiplayerHandler, thisPlayer);
-            player.AddComponent<MultiplayerPlayerDieHandler>().Init(_deathCamera, _cameraHolder, _playerRespawner);
+            player.AddComponent<MultiplayerPlayerDieHandler>().Init(_deathCamera, _cameraHolder);
             id = _multiplayerHandler.SessionId;
         }
 

@@ -10,7 +10,7 @@ public static class MapSettings
 
     public static void HideCursor()
     {
-        //Cursor.lockState = CursorLockMode.Locked;
-        //Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 }
