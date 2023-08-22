@@ -15,7 +15,7 @@ public class StateHandlerRoom : ColyseusManager<StateHandlerRoom>
         DontDestroyOnLoad(this);
     }
 
-    public void SendPlayerData(string key, object data)
+    public void SendPlayerData(string key, object data = null)
     {
         _room.Send(key, data);
     }

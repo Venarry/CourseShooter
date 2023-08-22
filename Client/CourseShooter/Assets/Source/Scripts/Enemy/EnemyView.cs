@@ -28,6 +28,7 @@ public class EnemyView : MonoBehaviour, IDamageable, ITeamable
 
     public event Action<int, ITeamable> TeamChanged;
     public event Action HealthOver;
+    public event Action<ITeamable> Leaved;
 
     public int TeamIndex { get; private set; }
     public bool IsAlive { get; private set; }
@@ -106,6 +107,11 @@ public class EnemyView : MonoBehaviour, IDamageable, ITeamable
         _myPlayer.Rotation.OnChange -= OnRotationChange;
         _myPlayer.WeaponPaths.OnAdd -= OnWeaponPathsAdded;
         _myPlayer.OnChange -= OnDataChange;
+    }
+
+    private void OnDestroy()
+    {
+        Leaved?.Invoke(this);
     }
 
     public void TakeDamage(int value, ShooterData ownerData)

@@ -14,7 +14,7 @@ public class Bootstrapper : MonoBehaviour
     {
         TeamsDataSource teamsDataSource = new(2);
         PlayerRespawner playerRespawner = new(_spawnPointsDataSource);
-        TeamsStateHandler teamsStateHandler = new(teamsDataSource, playerRespawner);
+        TeamsStateHandler teamsStateHandler = new(teamsDataSource, playerRespawner, _mapScoreView);
         teamsStateHandler.Enable();
 
         MultiplayerPlayerLauncher multiplayerPlayerLauncher = new(_teamSelector, _multiplayerHandler);

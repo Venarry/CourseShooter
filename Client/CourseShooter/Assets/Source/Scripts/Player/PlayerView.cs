@@ -27,6 +27,7 @@ public class PlayerView : MonoBehaviour, IDamageable, ITeamable
     public event Action HealthOver;
     public event Action<ShootInfo> Shooted;
     public event Action Respawned;
+    public event Action<ITeamable> Leaved;
 
     public int TeamIndex { get; private set; }
     public bool IsAlive { get; private set; }

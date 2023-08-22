@@ -25,7 +25,6 @@ public class TeamsDataSource
 
     public void AddToTeam(ITeamable teamable, int teamIndex)
     {
-        Debug.Log($"added {teamIndex}");
         if (_teams.ContainsKey(teamIndex) == false)
         {
             _teams.Add(teamIndex, new List<ITeamable>());
@@ -36,11 +35,7 @@ public class TeamsDataSource
 
         teamable.TeamChanged += OnTeamChanged;
         teamable.HealthOver += OnPlayerHealthOver;
-
-        for (int i = 0; i < _teams.Count; i++)
-        {
-            Debug.Log($"Team {i} - {_teams[i].Count} players");
-        }
+        teamable.Leaved += OnLeaved;
     }
 
     private void OnPlayerHealthOver()
@@ -50,8 +45,6 @@ public class TeamsDataSource
         if(aliveTeams.Count == 1)
         {
             OneTeamAlived?.Invoke(aliveTeams[0]);
-            //Debug.Log($"Alived {aliveTeams[0]}");
-            //StateHandlerRoom.Instance.SendPlayerData("AddScore", aliveTeams[0]);
         }
     }
 
@@ -59,15 +52,9 @@ public class TeamsDataSource
     {
         _teams[previousValue].Remove(player);
         _teams[player.TeamIndex].Add(player);
-
-        /*Debug.Log($"Teams-----");
-        for (int i = 0; i < _teams.Count; i++)
-        {
-            Debug.Log($"Team {i} - {_teams[i].Count} players");
-        }*/
     }
 
-    public void RemovePlayer(ITeamable teamable)
+    public void OnLeaved(ITeamable teamable)
     {
         if (_teams.ContainsKey(teamable.TeamIndex) == false)
         {
@@ -77,6 +64,7 @@ public class TeamsDataSource
         _teams[teamable.TeamIndex].Remove(teamable);
         teamable.TeamChanged -= OnTeamChanged;
         teamable.HealthOver -= OnPlayerHealthOver;
+        teamable.Leaved -= OnLeaved;
     }
 
     public int AddPlayerToSmallestTeam(ITeamable teamable)

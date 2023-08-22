@@ -55,6 +55,11 @@ export class MapScoreData extends Schema
     {
         this.Score++;
     }
+
+    SetScore(value: number)
+    {
+        this.Score = value;
+    }
 }
 
 export class Player extends Schema 
@@ -150,7 +155,7 @@ export class State extends Schema {
 
     @type( "string" )
     MapName;
-    
+
     AddScore(teamIndex: number)
     {
         if(this.Score.has(teamIndex.toString()))
@@ -161,6 +166,21 @@ export class State extends Schema {
         {
             var startScore = 1;
             var scoreData = new MapScoreData(teamIndex, startScore);
+            this.Score.set(teamIndex.toString(), scoreData);
+        }
+    }
+
+    SetScore(teamIndex: number, value: number)
+    {
+        console.log(teamIndex);
+        console.log(value);
+        if(this.Score.has(teamIndex.toString()))
+        {
+            this.Score.get(teamIndex.toString()).SetScore(value);
+        }
+        else
+        {
+            var scoreData = new MapScoreData(teamIndex, value);
             this.Score.set(teamIndex.toString(), scoreData);
         }
     }
@@ -225,6 +245,7 @@ export class State extends Schema {
 export class StateHandlerRoom extends Room<State>
 {
     maxClients = 4;
+    isRoundOver: boolean = false;
 
     onCreate (options) 
     {
@@ -233,8 +254,6 @@ export class StateHandlerRoom extends Room<State>
         this.setState(new State());
 
         this.setMetadata(options).then(() => updateLobby(this));
-        //this.setMetadata({ Password: "123" });
-        //this.metadata.Password = "123";
 
         console.log(this.metadata);
 
@@ -244,8 +263,6 @@ export class StateHandlerRoom extends Room<State>
             this.state.createPlayer(client.sessionId, spawnPosition);
             this.state.SetTeam(client.sessionId, data.TeamIndex);
             console.log("spawn " + client.sessionId);
-            //this.state.SetSpawnState(client.sessionId, true);
-            //this.broadcast("SpawnPlayer", client.sessionId, { except: client });
         });
 
         this.onMessage("SetPosition", (client, position) => 
@@ -299,9 +316,9 @@ export class StateHandlerRoom extends Room<State>
             this.state.SetPlayerHealth(data.Id, data.Value);
         });
 
-        this.onMessage("AddScore", (client, teamIndex) => 
+        this.onMessage("SetScore", (client, data) => 
         {
-            this.state.AddScore(teamIndex);
+            this.state.SetScore(data.TeamIndex, data.Value);
         });
 
         this.onMessage("OnRespawn", (client, id) => 

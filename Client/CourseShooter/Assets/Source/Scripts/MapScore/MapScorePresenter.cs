@@ -5,9 +5,8 @@ using UnityEngine;
 
 public class MapScorePresenter
 {
-    private MapScoreModel _mapScoreModel;
-    private MapScoreView _mapScoreView;
-
+    private readonly MapScoreModel _mapScoreModel;
+    private readonly MapScoreView _mapScoreView;
 
     public MapScorePresenter(MapScoreModel mapScoreModel, MapScoreView mapScoreView)
     {
@@ -23,6 +22,19 @@ public class MapScorePresenter
     public void Disable()
     {
         _mapScoreModel.ScoreChanged -= OnScoreChanged;
+    }
+
+    public int GetTeamScore(int teamIndex) =>
+        _mapScoreModel.GetTeamScore(teamIndex);
+
+    public void AddScore(int teamIndex)
+    {
+        _mapScoreModel.AddScore(teamIndex);
+    }
+
+    public void SetScore(int teamIndex, int value)
+    {
+        _mapScoreModel.SetScore(teamIndex, value);
     }
 
     private void OnScoreChanged(int key, int value)
