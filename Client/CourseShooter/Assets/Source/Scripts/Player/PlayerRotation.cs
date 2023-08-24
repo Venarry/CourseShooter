@@ -7,7 +7,7 @@ public class PlayerRotation : MonoBehaviour
 
     private MainCameraHolder _cameraHolder;
     private Vector3 _currentRotation;
-    private float _sensetivity = 10;
+    private float _sensetivity = 1;
 
     public event Action<Vector3> RotationXChanged;
 
@@ -33,6 +33,7 @@ public class PlayerRotation : MonoBehaviour
 
     public void AddRotationAxis(Vector3 axis)
     {
+        Debug.Log(axis);
         _currentRotation.y += axis.x * _sensetivity;
         _currentRotation.x -= axis.y * _sensetivity;
 

@@ -102,26 +102,38 @@ public class PlayerView : MonoBehaviour, IDamageable, ITeamable
     private void Update()
     {
         if (PauseHandler.IsPaused == true)
-            return;
+        {
+            ProcessMovement(Vector3.zero);
+            _playerCameraRotation.AddRotationAxis(Vector3.zero);
+        }
+        else
+        {
+            ProcessMovement(_inputsHandler.MoveDirection);
+            _playerCameraRotation.AddRotationAxis(_inputsHandler.RotationDirection);
 
-        ProcessJump();
-        ProcessShooting();
+            ProcessShooting();
+            ProcessJump();
+        }
     }
 
     private void FixedUpdate()
     {
-        if (PauseHandler.IsPaused == false)
+        /*if (PauseHandler.IsPaused == false)
         {
             _playerMovement.SetMoveDirection(_inputsHandler.MoveDirection);
-            _playerCameraRotation.AddRotationAxis(_inputsHandler.RotationDirection);
+            //_playerCameraRotation.AddRotationAxis(_inputsHandler.RotationDirection);
         }
         else
         {
             _playerMovement.SetMoveDirection(Vector3.zero);
-            _playerCameraRotation.AddRotationAxis(Vector3.zero);
+            //_playerCameraRotation.AddRotationAxis(Vector3.zero);
         }
 
-        ProcessMovement();
+        ProcessMovement();*/
+    }
+
+    private void LateUpdate()
+    {
         ProcessRotation();
     }
 
@@ -179,8 +191,9 @@ public class PlayerView : MonoBehaviour, IDamageable, ITeamable
             _playerMovement.TryJump();
     }
 
-    private void ProcessMovement()
+    private void ProcessMovement(Vector3 moveDirection)
     {
+        _playerMovement.SetMoveDirection(moveDirection);
         _playerMovement.Move();
     }
 

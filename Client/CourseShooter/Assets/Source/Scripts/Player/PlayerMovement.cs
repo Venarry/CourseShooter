@@ -6,7 +6,7 @@ using UnityEngine.UIElements;
 [RequireComponent(typeof(CharacterController))]
 public class PlayerMovement : MonoBehaviour
 {
-    [SerializeField] private float _speed = 0.1f;
+    [SerializeField] private float _speed = 8f;
     [SerializeField] private float _jumpStrength = 0.5f;
     [SerializeField] private float _gravity = 0.03f;
 
@@ -20,7 +20,7 @@ public class PlayerMovement : MonoBehaviour
     public event Action<Vector3> PositionChanged;
     public event Action<Vector3> DirectionChanged;
 
-    public Vector3 MoveDirection => _moveDirection;
+    public Vector3 MoveDirection => _moveDirection * Time.deltaTime;
 
     private void Awake()
     {
@@ -45,7 +45,7 @@ public class PlayerMovement : MonoBehaviour
     {
         Vector3 previousVelocity = _characterController.velocity;
         Vector3 previousPosition = transform.position;
-        _characterController.Move(_moveDirection);
+        _characterController.Move(MoveDirection);
         ReduceGravityForce();
 
         Vector3 currentVelocity = _characterController.velocity;
@@ -105,13 +105,13 @@ public class PlayerMovement : MonoBehaviour
                 _isStayOnGound = false;
             }
 
-            _gravityForce -= _gravity;
+            _gravityForce -= _gravity * Time.deltaTime;
         }
 
 
         if (_localVelocity.magnitude >= 0f)
         {
-            _localVelocity -= _localVelocity * 0.02f;
+            _localVelocity -= _localVelocity * Time.deltaTime;
 
             if (_localVelocity.magnitude < 0f)
                 _localVelocity = Vector3.zero;

@@ -13,5 +13,5 @@ public class KeyboardInputsHandler : IInputsHandler
     public Vector3 RotationDirection => new(Input.GetAxisRaw(MouseX), Input.GetAxisRaw(MouseY), 0);
     public bool IsPressedShoot => Input.GetMouseButton(0);
     public bool IsPressedNextWeapon => Input.GetKeyDown(KeyCode.Q);
-    public bool IsPressedKeyJump => Input.GetKeyDown(KeyCode.Space);
+    public bool IsPressedKeyJump => Input.GetKey(KeyCode.Space);
 }
